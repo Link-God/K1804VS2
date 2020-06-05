@@ -6,9 +6,9 @@
 #include <cinttypes>
 #include "logger.h"
 
-#define  YOUNG 0 
-#define  MID 1 
-#define  OLD 2 
+#define  YOUNG 0
+#define  MID 1
+#define  OLD 2
 const int REGISTER_SIZE = 4;
 const int NUM_OF_REGISTERS = 16;
 const int PIN_I_SIZE = 9;
@@ -61,7 +61,8 @@ class K1804BC2 : public IDSIMMODEL
 	bool isPosedge(IDSIMPIN* pin);
 	void setState(ABSTIME time, IDSIMPIN* pin, int set);
 
-	struct CommandFields {
+	struct CommandFields
+	{
 		uint8_t From;
 		uint8_t Alu;
 		uint8_t To;
@@ -71,13 +72,17 @@ class K1804BC2 : public IDSIMMODEL
 		uint8_t DB;
 		bool I0;
 		bool C0;
+		int position; // позиция в секции
 	};
+
 	CommandFields* getCommand();
 
-	struct Operands {
+	struct Operands
+	{
 		uint8_t R;
 		uint8_t S;
 	};
+
 	Operands* getOperands(const CommandFields* cmd, ILogger* log);
 
 	void __download__000(const CommandFields* cmd, Operands* ops, ILogger* log);
@@ -87,7 +92,8 @@ class K1804BC2 : public IDSIMMODEL
 	void __download__101(const CommandFields* cmd, Operands* ops, ILogger* log);
 	void __download__11X(const CommandFields* cmd, Operands* ops, ILogger* log);
 
-	struct ALUReasult {
+	struct ALUReasult
+	{
 		uint8_t Y; // Результат Алу
 		bool P_OVR; // Переполнение
 		bool C4; // Перенос из старшего разряда
@@ -100,15 +106,16 @@ class K1804BC2 : public IDSIMMODEL
 
 
 	//I1-4
-	void __alu__0000(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);// I0 важно
+	// I0 важно
+	void __alu__0000(bool c0, bool i0, const Operands* ops, const uint8_t special_code, ALUReasult* res, ILogger* log);
 	void __alu__0001(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
 	void __alu__0010(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
 	void __alu__0011(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
 	void __alu__0100(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
 	void __alu__0101(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
-	void __alu__0110(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);//I0=0 -> error (reserved func)
-	void __alu__0111(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);//I0=0 -> error (reserved func)
-	void __alu__1000(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);//I0=0 -> error (reserved func)
+	void __alu__0110(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
+	void __alu__0111(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
+	void __alu__1000(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
 	void __alu__1001(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
 	void __alu__1010(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
 	void __alu__1011(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
@@ -116,12 +123,11 @@ class K1804BC2 : public IDSIMMODEL
 	void __alu__1101(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
 	void __alu__1110(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
 	void __alu__1111(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
-	
-	
+
 
 	void load(const CommandFields* cmd, ALUReasult* res, ILogger* log);
-	void special(const CommandFields* cmd, ALUReasult* res, ILogger* log);
-	
+	void special(bool c0, const Operands* ops, const uint8_t code, ALUReasult* res, ILogger* log);
+
 	void __load__0000(const CommandFields* cmd, ALUReasult* res, ILogger* log);
 	void __load__0001(const CommandFields* cmd, ALUReasult* res, ILogger* log);
 	void __load__0010(const CommandFields* cmd, ALUReasult* res, ILogger* log);
@@ -140,17 +146,18 @@ class K1804BC2 : public IDSIMMODEL
 	void __load__1111(const CommandFields* cmd, ALUReasult* res, ILogger* log);
 
 	// TODO не все коды есть -> сделать исключения ?? по пинам 
-	void __special__0000(const CommandFields* cmd, ALUReasult* res, ILogger* log);
-	void __special__0010(const CommandFields* cmd, ALUReasult* res, ILogger* log);
-	void __special__0100(const CommandFields* cmd, ALUReasult* res, ILogger* log);
-	void __special__0101(const CommandFields* cmd, ALUReasult* res, ILogger* log);
-	void __special__0110(const CommandFields* cmd, ALUReasult* res, ILogger* log);
-	void __special__1000(const CommandFields* cmd, ALUReasult* res, ILogger* log);
-	void __special__1010(const CommandFields* cmd, ALUReasult* res, ILogger* log);
-	void __special__1100(const CommandFields* cmd, ALUReasult* res, ILogger* log);
-	void __special__1110(const CommandFields* cmd, ALUReasult* res, ILogger* log);
-	
-	void computeFlags(ALUReasult* res, bool c0, const Operands* ops, uint8_t aluCode); // можно наверное поменять структуру
+	void __special__0000(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
+	void __special__0010(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
+	void __special__0100(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
+	void __special__0101(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
+	void __special__0110(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
+	void __special__1000(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
+	void __special__1010(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
+	void __special__1100(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
+	void __special__1110(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
+
+	void computeFlags(ALUReasult* res, bool c0, const Operands* ops, uint8_t aluCode);
+	// можно наверное поменять структуру
 	int getPosition();
 public:
 	INT isdigital(CHAR* pinname);
@@ -161,5 +168,3 @@ public:
 	VOID simulate(ABSTIME time, DSIMMODES mode);
 	VOID callback(ABSTIME time, EVENTID eventid);
 };
-
-

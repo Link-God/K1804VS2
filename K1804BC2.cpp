@@ -17,6 +17,7 @@ uint8_t K1804BC2::genValue(IDSIMPIN** pins, size_t n, size_t offset)
 // линковка выходов схемы в Proteus и в коде
 VOID K1804BC2::setup(IINSTANCE* instance, IDSIMCKT* dsimckt)
 {
+	// TODO проверить 
 	_inst = instance;
 	_ckt = dsimckt;
 
@@ -94,37 +95,103 @@ K1804BC2::CommandFields* K1804BC2::getCommand()
 	cmd->DB = genValue(_pin_DB, REGISTER_SIZE);
 	cmd->C0 = isHigh(_pin_C0);
 	cmd->I0 = isHigh(_pin_I[0]);
+	cmd->position = getPosition();
 	return cmd;
 }
 
+// R = POH(A), S = POH(B)
 void K1804BC2::__download__000(const CommandFields* cmd, Operands* ops, ILogger* log)
 {
-	// TODO
+	if (cmd == nullptr || ops == nullptr)
+	{
+		return;
+	}
+	ops->R = _regs[cmd->A];
+	ops->S = _regs[cmd->B];
+	if (log != nullptr)
+	{
+		log->log("From: R=POH(A=" + std::to_string(cmd->A) + ")="
+			+ std::to_string(ops->R) + ", S=POH(A=" + std::to_string(cmd->B) + ")="
+			+ std::to_string(ops->S));
+	}
 }
 
+// R = POH(A), S = DB
 void K1804BC2::__download__001(const CommandFields* cmd, Operands* ops, ILogger* log)
 {
-	// TODO
+	if (cmd == nullptr || ops == nullptr)
+	{
+		return;
+	}
+	ops->R = _regs[cmd->A];
+	ops->S = cmd->DB;
+	if (log != nullptr)
+	{
+		log->log("From: R=POH(A=" + std::to_string(cmd->A) + ")="
+			+ std::to_string(ops->R) + ", S=DB=" + std::to_string(ops->S));
+	}
 }
 
+// 010: R=POH(A), S=Q
 void K1804BC2::__download__01X(const CommandFields* cmd, Operands* ops, ILogger* log)
 {
-	// TODO
+	if (cmd == nullptr || ops == nullptr)
+	{
+		return;
+	}
+	ops->R = _regs[cmd->A];
+	ops->S = _reg_q;
+	if (log != nullptr)
+	{
+		log->log("From: R=POH(A=" + std::to_string(cmd->A) + ")="
+			+ std::to_string(ops->R) + ", S=PQ=" + std::to_string(ops->S));
+	}
 }
 
+// R = DA, S = POH(B)
 void K1804BC2::__download__100(const CommandFields* cmd, Operands* ops, ILogger* log)
 {
-	// TODO
+	if (cmd == nullptr || ops == nullptr)
+	{
+		return;
+	}
+	ops->R = cmd->DA;
+	ops->S = _regs[cmd->B];
+	if (log != nullptr)
+	{
+		log->log("From: R=DA=" + std::to_string(ops->R) + ", S=POH(B="
+			+ std::to_string(cmd->B) + ")=" + std::to_string(ops->S));
+	}
 }
 
+// R = DA, S = DB
 void K1804BC2::__download__101(const CommandFields* cmd, Operands* ops, ILogger* log)
 {
-	// TODO
+	if (cmd == nullptr || ops == nullptr)
+	{
+		return;
+	}
+	ops->R = cmd->DA;
+	ops->S = cmd->DB;
+	if (log != nullptr)
+	{
+		log->log("From: R=DA=" + std::to_string(ops->R) + ", S=DB=" + std::to_string(ops->S));
+	}
 }
 
+// R = DA, S = Q
 void K1804BC2::__download__11X(const CommandFields* cmd, Operands* ops, ILogger* log)
 {
-	// TODO
+	if (cmd == nullptr || ops == nullptr)
+	{
+		return;
+	}
+	ops->R = cmd->DA;
+	ops->S = _reg_q;
+	if (log != nullptr)
+	{
+		log->log("From: R=DA=" + std::to_string(ops->R) + ", S=PQ=" + std::to_string(ops->S));
+	}
 }
 
 // Загрузка операндов
@@ -174,87 +241,256 @@ K1804BC2::Operands* K1804BC2::getOperands(const CommandFields* cmd, ILogger* log
 	return ops;
 }
 
-void K1804BC2::__alu__0000(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
+// I0 = 0 -> специальный функции
+// I0 = 1 -> 1111
+void K1804BC2::__alu__0000(bool c0, bool i0, const Operands* ops, const uint8_t special_code, ALUReasult* res,
+                           ILogger* log)
 {
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	if (i0 == 0)
+	{
+		special(c0, ops, special_code, res, log);
+	}
+	else
+	{
+		res->Y = 0b1111;
+		if (log != nullptr)
+		{
+			log->log("ALU: Y=1111");
+		}
+		//computeFlags(res, c0, ops, 0);
+	}
 }
 
+// S - R - 1 + C0
 void K1804BC2::__alu__0001(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	res->Y = ops->S - ops->R - 1 + c0;
+	if (log != nullptr)
+	{
+		log->log("ALU: Y=S-R-1+C0=" + std::to_string(ops->S) + "-"
+			+ std::to_string(ops->R) + "-1+" + std::to_string(c0) + "="
+			+ std::to_string(res->Y));
+	}
+	//computeFlags(res, c0, ops, 0);
 }
 
+//R - S - 1 + C0
 void K1804BC2::__alu__0010(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	res->Y = ops->R - ops->S - 1 + c0;
+	if (log != nullptr)
+	{
+		log->log("ALU: Y=R-S-1+C0=" + std::to_string(ops->R) + "-"
+			+ std::to_string(ops->S) + "-1+" + std::to_string(c0) + "="
+			+ std::to_string(res->Y));
+	}
 }
 
+// R + S + C0
 void K1804BC2::__alu__0011(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	res->Y = ops->R + ops->S + c0;
+	if (log != nullptr)
+	{
+		log->log("ALU: Y=R+S+C0=" + std::to_string(ops->R) + "+"
+			+ std::to_string(ops->S) + "+" + std::to_string(c0) + "="
+			+ std::to_string(res->Y));
+	}
 }
 
+// S + C0
 void K1804BC2::__alu__0100(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	res->Y = ops->S + c0;
+	if (log != nullptr)
+	{
+		log->log("ALU: Y=S+C0=" + std::to_string(ops->S) + "+" + std::to_string(c0) + "="
+			+ std::to_string(res->Y));
+	}
 }
 
+//~S + C0
 void K1804BC2::__alu__0101(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	res->Y = ~ops->S + c0;
+	if (log != nullptr)
+	{
+		log->log("ALU: Y=~S+C0=" + std::to_string(~ops->S) + "+" + std::to_string(c0) + "="
+			+ std::to_string(res->Y));
+	}
 }
 
+//R + C0
 void K1804BC2::__alu__0110(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	//I0=0 -> error (reserved func)
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	res->Y = ops->R + c0;
+	if (log != nullptr)
+	{
+		log->log("ALU: Y=R+C0=" + std::to_string(ops->R) + "+" + std::to_string(c0) + "="
+			+ std::to_string(res->Y));
+	}
 }
 
+//~R + C0
 void K1804BC2::__alu__0111(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	//I0=0 -> error (reserved func)
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	res->Y = ~ops->R + c0;
+	if (log != nullptr)
+	{
+		log->log("ALU: Y=~S+C0=" + std::to_string(~ops->R) + "+" + std::to_string(c0) + "="
+			+ std::to_string(res->Y));
+	}
 }
 
+//0000
 void K1804BC2::__alu__1000(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	//I0=0 -> error (reserved func)
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	res->Y = 0b0000;
+	if (log != nullptr)
+	{
+		log->log("ALU: Y=0000");
+	}
 }
 
+// ~R & S
 void K1804BC2::__alu__1001(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	res->Y = ~ops->R & ops->S;
+	if (log != nullptr)
+	{
+		log->log("ALU: Y=~R&S=" + std::to_string(~ops->R) + "&" + std::to_string(ops->S) + "="
+			+ std::to_string(res->Y));
+	}
 }
 
+//~(R ^ S)
 void K1804BC2::__alu__1010(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	res->Y = ~(ops->R ^ ops->S);
+	if (log != nullptr)
+	{
+		log->log("ALU: Y=~(R^S)=~(" + std::to_string(ops->R) + "^" + std::to_string(ops->S) + ")="
+			+ std::to_string(res->Y));
+	}
 }
 
+//R ^ S
 void K1804BC2::__alu__1011(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	res->Y = ops->R ^ ops->S;
+	if (log != nullptr)
+	{
+		log->log("ALU: Y=~(R^S)=" + std::to_string(ops->R) + "^" + std::to_string(ops->S) + "="
+			+ std::to_string(res->Y));
+	}
 }
 
+//R & S
 void K1804BC2::__alu__1100(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	res->Y = ops->R & ops->S;
+	if (log != nullptr)
+	{
+		log->log("ALU: Y=R&S=" + std::to_string(ops->R) + "&" + std::to_string(ops->S) + "="
+			+ std::to_string(res->Y));
+	}
 }
 
+//~(R | S)
 void K1804BC2::__alu__1101(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	res->Y = ~(ops->R | ops->S);
+	if (log != nullptr)
+	{
+		log->log("ALU: Y=~(R|S)=~(" + std::to_string(ops->R) + "|" + std::to_string(ops->S) + ")="
+			+ std::to_string(res->Y));
+	}
 }
 
+// ~(R & S)
 void K1804BC2::__alu__1110(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	res->Y = ~(ops->R & ops->S);
+	if (log != nullptr)
+	{
+		log->log("ALU: Y=~(R&S)=~(" + std::to_string(ops->R) + "&" + std::to_string(ops->S) + ")="
+			+ std::to_string(res->Y));
+	}
 }
 
+// R | S
 void K1804BC2::__alu__1111(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	res->Y = ops->R | ops->S;
+	if (log != nullptr)
+	{
+		log->log("ALU: Y=R|S=" + std::to_string(ops->R) + "|" + std::to_string(ops->S) + "="
+			+ std::to_string(res->Y));
+	}
 }
 
 K1804BC2::ALUReasult* K1804BC2::ALU(bool c0, uint8_t code, const Operands* ops, ILogger* log)
@@ -264,13 +500,15 @@ K1804BC2::ALUReasult* K1804BC2::ALU(bool c0, uint8_t code, const Operands* ops, 
 		return nullptr;
 	}
 	auto res = new ALUReasult();
+	auto special_code = genValue(_pin_I, 9, 5);
+	auto I0 = isHigh(_pin_I[0]);
 	// TODO : исключения в некторых случаях в зависимотси от I0
 	switch (code)
 	{
 		// I0 = 0 -> специальный функции
 		// I0 = 1 -> 1111
 	case 0:
-		__alu__0000(c0, ops, res, log);
+		__alu__0000(c0, I0, ops, special_code, res, log);
 		break;
 		//S - R - 1 + C0
 	case 1:
@@ -418,49 +656,136 @@ void K1804BC2::__load__1111(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	// TODO
 }
 
-void K1804BC2::__special__0000(const CommandFields* cmd, ALUReasult* res, ILogger* log)
+void K1804BC2::__special__0000(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	uint8_t F;
+	if (isLow(_pin_Z))
+		F = ops->S + c0;
+	else
+		F = ops->R + ops->S + c0;
+
+	// TODO load (сдвиги и тд)
+	// TODO логи
 }
 
-void K1804BC2::__special__0010(const CommandFields* cmd, ALUReasult* res, ILogger* log)
+void K1804BC2::__special__0010(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	uint8_t F;
+	if (isLow(_pin_Z))
+		F = ops->S + c0;
+	else
+		F = ops->R + ops->S + c0;
+
+	// TODO load (сдвиги и тд)
+	// TODO логи
 }
 
-void K1804BC2::__special__0100(const CommandFields* cmd, ALUReasult* res, ILogger* log)
+void K1804BC2::__special__0100(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	uint8_t F = ops->S + 1 + c0;
+
+	// TODO load (сдвиги и тд)
+	// TODO логи
 }
 
-void K1804BC2::__special__0101(const CommandFields* cmd, ALUReasult* res, ILogger* log)
+void K1804BC2::__special__0101(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	uint8_t F;
+	if (isLow(_pin_Z))
+		F = ops->S + c0;
+	else
+		F = ~ops->S + c0;
+
+	// TODO load (сдвиги и тд)
+	// TODO логи
 }
 
-void K1804BC2::__special__0110(const CommandFields* cmd, ALUReasult* res, ILogger* log)
+void K1804BC2::__special__0110(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	uint8_t F;
+	if (isLow(_pin_Z))
+		F = ops->S + c0;
+	else
+		F = ops->S - ops->R - 1 + c0;
+
+	// TODO load (сдвиги и тд)
+	// TODO логи
 }
 
-void K1804BC2::__special__1000(const CommandFields* cmd, ALUReasult* res, ILogger* log)
+void K1804BC2::__special__1000(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	uint8_t F = ops->S + c0;
+
+	// TODO load (сдвиги и тд)
+	// TODO логи
 }
 
-void K1804BC2::__special__1010(const CommandFields* cmd, ALUReasult* res, ILogger* log)
+void K1804BC2::__special__1010(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	uint8_t F = ops->S + c0;
+
+	// TODO load (сдвиги и тд)
+	// TODO логи
 }
 
-void K1804BC2::__special__1100(const CommandFields* cmd, ALUReasult* res, ILogger* log)
+void K1804BC2::__special__1100(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	uint8_t F;
+	if (isLow(_pin_Z))
+		F = ops->S + ops->R + c0;
+	else
+		F = ops->S - ops->R - 1 + c0;
+
+	// TODO load (сдвиги и тд)
+	// TODO логи
 }
 
-void K1804BC2::__special__1110(const CommandFields* cmd, ALUReasult* res, ILogger* log)
+void K1804BC2::__special__1110(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (ops == nullptr || res == nullptr)
+	{
+		return;
+	}
+	uint8_t F;
+	if (isLow(_pin_Z))
+		F = ops->S + ops->R + c0;
+	else
+		F = ops->S - ops->R - 1 + c0;
+
+	// TODO load (сдвиги и тд)
+	// TODO логи
 }
 
 
@@ -541,36 +866,36 @@ void K1804BC2::load(const CommandFields* cmd, ALUReasult* res, ILogger* log)
 	_reg_y = res->Y & 0b1111;
 }
 
-void K1804BC2::special(const CommandFields* cmd, ALUReasult* res, ILogger* log)
+void K1804BC2::special(bool c0, const Operands* ops, const uint8_t code, ALUReasult* res, ILogger* log)
 {
-	switch (cmd->To)
+	switch (code)
 	{
 	case 0:
-		__special__0000(cmd, res, log);
+		__special__0000(c0, ops, res, log);
 		break;
 	case 2:
-		__special__0010(cmd, res, log);
+		__special__0010(c0, ops, res, log);
 		break;
 	case 4:
-		__special__0100(cmd, res, log);
+		__special__0100(c0, ops, res, log);
 		break;
 	case 5:
-		__special__0101(cmd, res, log);
+		__special__0101(c0, ops, res, log);
 		break;
 	case 6:
-		__special__0110(cmd, res, log);
+		__special__0110(c0, ops, res, log);
 		break;
 	case 8:
-		__special__1000(cmd, res, log);
+		__special__1000(c0, ops, res, log);
 		break;
 	case 10:
-		__special__1010(cmd, res, log);
+		__special__1010(c0, ops, res, log);
 		break;
 	case 12:
-		__special__1100(cmd, res, log);
+		__special__1100(c0, ops, res, log);
 		break;
 	case 14:
-		__special__1110(cmd, res, log);
+		__special__1110(c0, ops, res, log);
 		break;
 	default:
 		// TODO throw ??
