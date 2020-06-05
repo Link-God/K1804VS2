@@ -84,17 +84,7 @@ VOID K1804BC2::setup(IINSTANCE* instance, IDSIMCKT* dsimckt)
 // получение данных со всех входов
 K1804BC2::CommandFields* K1804BC2::getCommand()
 {
-	CommandFields* cmd = new CommandFields();
-	cmd->From = (isHigh(_pin_EA) << 2) | (isHigh(_pin_I[0]) << 1) | isHigh(_pin_OEB);
-	cmd->Alu = genValue(_pin_I, 5, 1);
-	cmd->To = genValue(_pin_I, 9, 5);
-	cmd->A = genValue(_pin_A, REGISTER_SIZE);
-	cmd->B = genValue(_pin_B, REGISTER_SIZE);
-	cmd->DA = genValue(_pin_DA, REGISTER_SIZE);
-	cmd->DB = genValue(_pin_DB, REGISTER_SIZE);
-	cmd->C0 = isHigh(_pin_C0);
-	cmd->I0 = isHigh(_pin_I[0]);
-	return cmd;
+	// TODO тож самое почти, но пины другие
 }
 
 void K1804BC2::__download__000(const CommandFields* cmd, Operands* ops, ILogger* log)
@@ -138,35 +128,35 @@ K1804BC2::Operands* K1804BC2::getOperands(const CommandFields* cmd, ILogger* log
 	// TODO проверить так ли нужно вызывавать
 	switch (cmd->From)
 	{
-		// 000: R=POH(A), S=POH(B)
+		// 000: R=POH(A), S=PQ
 	case 0:
 		__download__000(cmd, ops, log);
 		break;
-		// 001: R=POH(A), S=DB
+		// 001: R=POH(A), S=POH(B)
 	case 1:
 		__download__001(cmd, ops, log);
 		break;
-		// 010: R=POH(A), S=Q
+		// 010: R=0, S=PQ
 	case 2:
 		__download__01X(cmd, ops, log);
 		break;
-		// 011: R=POH(A), S=Q
+		// 011: R=0, S=POH(B)
 	case 3:
 		__download__01X(cmd, ops, log);
 		break;
-		// 100: R=DA, S=POH(B)
+		// 100: R=0, S=POH(A)
 	case 4:
 		__download__100(cmd, ops, log);
 		break;
-		// 101: R=DA, S=DB
+		// 101: R=D, S=POH(A)
 	case 5:
 		__download__101(cmd, ops, log);
 		break;
-		// 110: R=DA, S=Q
+		// 110: R=D, S=PQ
 	case 6:
 		__download__11X(cmd, ops, log);
 		break;
-		// 111: R=DA, S=Q
+		// 111: R=D, S=0
 	case 7:
 		__download__11X(cmd, ops, log);
 		break;
@@ -339,27 +329,64 @@ K1804BC2::ALUReasult* K1804BC2::ALU(bool c0, uint8_t code, const Operands* ops, 
 
 void K1804BC2::__load__0000(const CommandFields* cmd, ALUReasult* res, ILogger* log)
 {
-	// TODO
+
+	// сдвиг не доделал, не смотри даже)
+	// if (cmd == nullptr || res == nullptr)
+	// {
+	// 	return;
+	// }
+
+	// uint8_t y = res->Y >> 1;
+	// res->Y = y;
+	// if (log != nullptr) {
+	// 	log->log("Load: Y->Y/2=" + std::to_string(res->Y & 0b1111) + ") Q - hold";
+	// }
 }
 
 void K1804BC2::__load__0001(const CommandFields* cmd, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	// сдвиг не доделал, не смотри даже)
+	// if (cmd == nullptr || res == nullptr)
+	// {
+	// 	return;
+	// }
+
+	// uint8_t y = res->Y >> 1;
+	// res->Y = y;
+	// if (log != nullptr) {
+	// 	log->log("Load: Y->Y/2=" + std::to_string(res->Y & 0b1111) + ") Q - hold";
+	// }
 }
 
 void K1804BC2::__load__0010(const CommandFields* cmd, ALUReasult* res, ILogger* log)
 {
 	// TODO
+	// if (isLow(_pin_IEN)) 
+	// {
+	// 	uint8_t pq = _reg_q >> 1;
+	// }
+
 }
 
 void K1804BC2::__load__0011(const CommandFields* cmd, ALUReasult* res, ILogger* log)
 {
 	// TODO
+	// if (isLow(_pin_IEN)) 
+	// {
+	// 	uint8_t pq = _reg_q >> 1;
+	// }
 }
 
 void K1804BC2::__load__0100(const CommandFields* cmd, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (cmd == nullptr || res == nullptr) 
+	{
+		return;
+	}
+
+	if (log != nullptr) {
+		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) + ") Q - hold";
+	}
 }
 
 void K1804BC2::__load__0101(const CommandFields* cmd, ALUReasult* res, ILogger* log)
@@ -370,7 +397,16 @@ void K1804BC2::__load__0101(const CommandFields* cmd, ALUReasult* res, ILogger* 
 
 void K1804BC2::__load__0110(const CommandFields* cmd, ALUReasult* res, ILogger* log)
 {
-	// TODO
+
+	// W flag == 0
+	if (cmd == nullptr || res == nullptr) 
+	{
+		return;
+	}
+
+	if (log != nullptr) {
+		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) + ") Q - hold";
+	}
 }
 
 void K1804BC2::__load__0111(const CommandFields* cmd, ALUReasult* res, ILogger* log)
@@ -395,7 +431,14 @@ void K1804BC2::__load__1010(const CommandFields* cmd, ALUReasult* res, ILogger* 
 
 void K1804BC2::__load__1011(const CommandFields* cmd, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (cmd == nullptr || res == nullptr) 
+	{
+		return;
+	}
+
+	if (log != nullptr) {
+		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) + ") Q - hold";
+	}
 }
 
 void K1804BC2::__load__1100(const CommandFields* cmd, ALUReasult* res, ILogger* log)
@@ -410,12 +453,26 @@ void K1804BC2::__load__1101(const CommandFields* cmd, ALUReasult* res, ILogger* 
 
 void K1804BC2::__load__1110(const CommandFields* cmd, ALUReasult* res, ILogger* log)
 {
-	// TODO
-}
+	if (cmd == nullptr || res == nullptr) 
+	{
+		return;
+	}
+
+	// PR0 -> Y[0,1,2,3] Q-hold
+	if (log != nullptr) {
+		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) + ") Q - hold";
+	}
 
 void K1804BC2::__load__1111(const CommandFields* cmd, ALUReasult* res, ILogger* log)
 {
-	// TODO
+	if (cmd == nullptr || res == nullptr) 
+	{
+		return;
+	}
+
+	if (log != nullptr) {
+		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) + ") Q - hold";
+	}	
 }
 
 void K1804BC2::__special__0000(const CommandFields* cmd, ALUReasult* res, ILogger* log)
