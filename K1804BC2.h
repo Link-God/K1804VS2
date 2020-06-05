@@ -38,8 +38,6 @@ class K1804BC2 : public IDSIMMODEL
 	IDSIMPIN* _pin_OEY;
 	IDSIMPIN* _pin_OEB;
 	IDSIMPIN* _pin_EA;
-	IDSIMPIN* _pin_EB;
-	IDSIMPIN* _pin_;
 	IDSIMPIN* _pin_T;
 	IDSIMPIN* _pin_C0;
 	IDSIMPIN* _pin_Y[REGISTER_SIZE];
@@ -71,6 +69,7 @@ class K1804BC2 : public IDSIMMODEL
 		uint8_t B;
 		uint8_t DA;
 		uint8_t DB;
+		bool I0;
 		bool C0;
 	};
 	CommandFields* getCommand();
