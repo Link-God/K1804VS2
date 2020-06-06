@@ -700,8 +700,14 @@ void K1804BC2::__load__0110(const CommandFields* cmd, ALUReasult* res, ILogger* 
 		return;
 	}
 
+	if (isLow(_pin_IEN)) 
+	{
+		uint8_t pq = (res->Y) & 0b1111;
+		_reg_q = (pq) & 0b1111;
+	}
+
 	if (log != nullptr) {
-		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) + " Q - hold";
+		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) + " Y->Q=" + std::to_string(_reg_q);
 	}
 }
 
@@ -713,8 +719,14 @@ void K1804BC2::__load__0111(const CommandFields* cmd, ALUReasult* res, ILogger* 
 		return;
 	}
 
+	if (isLow(_pin_IEN)) 
+	{
+		uint8_t pq = (res->Y) & 0b1111;
+		_reg_q = (pq) & 0b1111;
+	}
+
 	if (log != nullptr) {
-		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) + " Q - hold";
+		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) + " Y->Q=" + std::to_string(_reg_q);
 	}
 }
 
