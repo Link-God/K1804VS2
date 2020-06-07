@@ -30,6 +30,7 @@ class K1804BC2 : public IDSIMMODEL
 	bool _reg_c4;
 	bool _reg_p_ovr;
 	bool _reg_g_n;
+	bool _special = false;
 	IDSIMPIN* _pin_A[REGISTER_SIZE];
 	IDSIMPIN* _pin_B[REGISTER_SIZE];
 	IDSIMPIN* _pin_DA[REGISTER_SIZE];
