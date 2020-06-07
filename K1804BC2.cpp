@@ -504,66 +504,82 @@ K1804BC2::ALUReasult* K1804BC2::ALU(bool c0, uint8_t code, const Operands* ops, 
 		// I0 = 1 -> 1111
 	case 0:
 		__alu__0000(c0, I0, ops, special_code, res, log);
+		computeFlags(false, res, c0, ops, code);
 		break;
 		//S - R - 1 + C0
 	case 1:
 		__alu__0001(c0, ops, res, log);
+		computeFlags(false, res, c0, ops, code);
 		break;
 		//R - S - 1 + C0
 	case 2:
 		__alu__0010(c0, ops, res, log);
+		computeFlags(false, res, c0, ops, code);
 		break;
 		//R + S + C0
 	case 3:
 		__alu__0011(c0, ops, res, log);
+		computeFlags(false, res, c0, ops, code);
 		break;
 		//S + C0
 	case 4:
 		__alu__0100(c0, ops, res, log);
+		computeFlags(false, res, c0, ops, code);
 		break;
 		//~S + C0
 	case 5:
 		__alu__0101(c0, ops, res, log);
+		computeFlags(false, res, c0, ops, code);
 		break;
 		//R + C0
 	case 6:
 		__alu__0110(c0, ops, res, log);
+		computeFlags(false, res, c0, ops, code);
 		break;
 		//~R + C0
 	case 7:
 		__alu__0111(c0, ops, res, log);
+		computeFlags(false, res, c0, ops, code);
 		break;
 		//0000
 	case 8:
 		__alu__1000(c0, ops, res, log);
+		computeFlags(false, res, c0, ops, code);
 		break;
 		//~R & S
 	case 9:
 		__alu__1001(c0, ops, res, log);
+		computeFlags(false, res, c0, ops, code);
 		break;
 		//~(R ^ S)
 	case 10:
 		__alu__1010(c0, ops, res, log);
+		computeFlags(false, res, c0, ops, code);
 		break;
 		//R ^ S
 	case 11:
 		__alu__1011(c0, ops, res, log);
+		computeFlags(false, res, c0, ops, code);
 		break;
 		//R & S
 	case 12:
 		__alu__1100(c0, ops, res, log);
+		computeFlags(false, res, c0, ops, code);
 		break;
 		//~(R | S)
 	case 13:
 		__alu__1101(c0, ops, res, log);
+		computeFlags(false, res, c0, ops, code);
 		break;
 		//~(R & S)
 	case 14:
 		__alu__1110(c0, ops, res, log);
+		computeFlags(false, res, c0, ops, code);
 		break;
 		//R | S
 	case 15:
 		__alu__1111(c0, ops, res, log);
+		computeFlags(false, res, c0, ops, code);
 		break;
 	}
 	return res;
