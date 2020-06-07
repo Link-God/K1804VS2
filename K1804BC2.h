@@ -6,9 +6,9 @@
 #include <cinttypes>
 #include "logger.h"
 
-#define  YOUNG 0
-#define  MID 1
-#define  OLD 2
+const int YOUNG = 0;
+const int MID = 1;
+const int OLD = 2;
 const int REGISTER_SIZE = 4;
 const int NUM_OF_REGISTERS = 16;
 const int PIN_I_SIZE = 9;
@@ -19,7 +19,7 @@ class K1804BC2 : public IDSIMMODEL
 	IINSTANCE* _inst;
 	IDSIMCKT* _ckt;
 	ABSTIME _time;
-
+	int _pos = OLD;
 	uint32_t _dbg_counter = 0;
 	uint8_t _regs[NUM_OF_REGISTERS];
 	uint8_t _reg_q;
@@ -46,9 +46,9 @@ class K1804BC2 : public IDSIMMODEL
 	IDSIMPIN* _pin_F3;
 	IDSIMPIN* _pin_P_OVR;
 	IDSIMPIN* _pin_G_N;
-	IDSIMPIN* _pin_PR0;
+	IDSIMPIN* _pin_PF0;
 	IDSIMPIN* _pin_PQ0;
-	IDSIMPIN* _pin_PR3;
+	IDSIMPIN* _pin_PF3;
 	IDSIMPIN* _pin_PQ3;
 	IDSIMPIN* _pin_WE;
 	IDSIMPIN* _pin_IEN;
@@ -155,6 +155,16 @@ class K1804BC2 : public IDSIMMODEL
 	void __special__1010(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
 	void __special__1100(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
 	void __special__1110(bool c0, const Operands* ops, ALUReasult* res, ILogger* log);
+
+	void __special_load__0000(ALUReasult* res, ILogger* log);
+	void __special_load__0010(ALUReasult* res, ILogger* log);
+	void __special_load__0100(ALUReasult* res, ILogger* log);
+	void __special_load__0101(ALUReasult* res, ILogger* log);
+	void __special_load__0110(ALUReasult* res, ILogger* log);
+	void __special_load__1000(ALUReasult* res, ILogger* log);
+	void __special_load__1010(ALUReasult* res, ILogger* log);
+	void __special_load__1100(ALUReasult* res, ILogger* log);
+	void __special_load__1110(ALUReasult* res, ILogger* log);
 
 	void computeFlags(ALUReasult* res, bool c0, const Operands* ops, uint8_t aluCode);
 	// можно наверное поменять структуру

@@ -50,8 +50,8 @@ VOID K1804BC2::setup(IINSTANCE* instance, IDSIMCKT* dsimckt)
 
 	_pin_PQ0 = _inst->getdsimpin(const_cast<CHAR*>("PQ0"), true);
 	_pin_PQ3 = _inst->getdsimpin(const_cast<CHAR*>("PQ3"), true);
-	_pin_PF0 = _inst->getdsimpin(const_cast<CHAR*>("PR0"), true);
-	_pin_PF3 = _inst->getdsimpin(const_cast<CHAR*>("PR3"), true);
+	_pin_PF0 = _inst->getdsimpin(const_cast<CHAR*>("PF0"), true);
+	_pin_PF3 = _inst->getdsimpin(const_cast<CHAR*>("PF3"), true);
 	_pin_T = _inst->getdsimpin(const_cast<CHAR*>("T"), true);
 	_pin_OEB = _inst->getdsimpin(const_cast<CHAR*>("OEB"), true);
 	_pin_EA = _inst->getdsimpin(const_cast<CHAR*>("EA"), true);
@@ -95,7 +95,7 @@ K1804BC2::CommandFields* K1804BC2::getCommand()
 	cmd->DB = genValue(_pin_DB, REGISTER_SIZE);
 	cmd->C0 = isHigh(_pin_C0);
 	cmd->I0 = isHigh(_pin_I[0]);
-	cmd->position = getPosition();
+	_pos = cmd->position = getPosition();
 	return cmd;
 }
 
@@ -329,7 +329,7 @@ void K1804BC2::__alu__0100(bool c0, const Operands* ops, ALUReasult* res, ILogge
 	}
 }
 
-//~S + C0
+// ~S + C0
 void K1804BC2::__alu__0101(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
 	if (ops == nullptr || res == nullptr)
@@ -344,7 +344,7 @@ void K1804BC2::__alu__0101(bool c0, const Operands* ops, ALUReasult* res, ILogge
 	}
 }
 
-//R + C0
+// R + C0
 void K1804BC2::__alu__0110(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
 	if (ops == nullptr || res == nullptr)
@@ -359,7 +359,7 @@ void K1804BC2::__alu__0110(bool c0, const Operands* ops, ALUReasult* res, ILogge
 	}
 }
 
-//~R + C0
+// ~R + C0
 void K1804BC2::__alu__0111(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
 	if (ops == nullptr || res == nullptr)
@@ -374,7 +374,7 @@ void K1804BC2::__alu__0111(bool c0, const Operands* ops, ALUReasult* res, ILogge
 	}
 }
 
-//0000
+// 0000
 void K1804BC2::__alu__1000(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
 {
 	if (ops == nullptr || res == nullptr)
@@ -967,20 +967,63 @@ void K1804BC2::__load__1111(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	}
 }
 
-void K1804BC2::__special__0000(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
-{
+// S+C0, если Z=0; R+S+C0, если Z=1;
+void K1804BC2::__special__0000(bool c0, const Operands* ops, ALUReasult* res, ILogger* log) {
 	if (ops == nullptr || res == nullptr)
-	{
 		return;
-	}
-	uint8_t F;
-	if (isLow(_pin_Z))
-		F = ops->S + c0;
-	else
-		F = ops->R + ops->S + c0;
 
-	// TODO load (сдвиги и тд)
-	// TODO логи
+	if (isLow(_pin_Z)) {
+		res->Y = ops->S + c0;
+		log->log("ALU_SPECIAL: Z=0, Y=S+C0=" + std::to_string(ops->S) +
+			"+" + std::to_string(c0) + "=" + std::to_string(res->Y));
+	} else {
+		res->Y = ops->R + ops->S + c0;
+		log->log("ALU_SPECIAL: Z=1, Y=R+S+C0=" + std::to_string(ops->R) + 
+			"+" + std::to_string(ops->S) + "+" + std::to_string(c0) + 
+			"=" + std::to_string(res->Y));
+	}
+}
+
+// Лог. F/2->Y, Лог. Q/2->Q
+void K1804BC2::__special_load__0000(ALUReasult* res, ILogger* log) {
+	if (res == nullptr)
+		return;
+	std::string msg = "LOAD SP: Лог. F/2->Y, Лог. Q/2->Q\n";
+	// PF0=F0
+	if ((res->Y & 0b0001)) {
+		setState(_time, _pin_PF0, 1); // PF0 = 1
+		msg += "PF0=1,";
+	} else {
+		setState(_time, _pin_PF0, -1); // PF0 = 0
+		msg += "PF0=0,";
+	}
+	// Y=F/2
+	res->Y = res->Y >> 1;
+	// Если не старшая МПС, то PF3 вход
+	if (_pos != OLD) {
+		// F3 = PF3
+		if (isHigh(_pin_PF3)) {
+			res->Y |= 0b1000; // F3 = 1
+			msg += "F3=PF3=1,";
+		}
+	}
+	msg += "F=F/2=" + std::to_string(res->Y) + "\n";
+	// PQ0=Q0
+	if ((_reg_q & 0b0001)) {
+		setState(_time, _pin_PQ0, 1); // PQ0 = 1
+		msg += "PQ0=1,";
+	} else {
+		setState(_time, _pin_PQ0, -1); // PQ0 = 0
+		msg += "PQ0=0,";
+	}
+	// Q=Q/2
+	_reg_q = _reg_q >> 1;
+	// Q3 = PQ3
+	if (isHigh(_pin_PQ3)) {
+		_reg_q |= 0b1000; // Q3 = 1
+		msg += "Q3=PQ3=1,";
+	}
+	msg += "Q=Q/2=" + std::to_string(_reg_q) + "\n";
 }
 
 void K1804BC2::__special__0010(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
@@ -995,7 +1038,6 @@ void K1804BC2::__special__0010(bool c0, const Operands* ops, ALUReasult* res, IL
 	else
 		F = ops->R + ops->S + c0;
 
-	// TODO load (сдвиги и тд)
 	// TODO логи
 }
 
@@ -1007,7 +1049,6 @@ void K1804BC2::__special__0100(bool c0, const Operands* ops, ALUReasult* res, IL
 	}
 	uint8_t F = ops->S + 1 + c0;
 
-	// TODO load (сдвиги и тд)
 	// TODO логи
 }
 
@@ -1023,7 +1064,6 @@ void K1804BC2::__special__0101(bool c0, const Operands* ops, ALUReasult* res, IL
 	else
 		F = ~ops->S + c0;
 
-	// TODO load (сдвиги и тд)
 	// TODO логи
 }
 
@@ -1039,7 +1079,6 @@ void K1804BC2::__special__0110(bool c0, const Operands* ops, ALUReasult* res, IL
 	else
 		F = ops->S - ops->R - 1 + c0;
 
-	// TODO load (сдвиги и тд)
 	// TODO логи
 }
 
@@ -1051,7 +1090,6 @@ void K1804BC2::__special__1000(bool c0, const Operands* ops, ALUReasult* res, IL
 	}
 	uint8_t F = ops->S + c0;
 
-	// TODO load (сдвиги и тд)
 	// TODO логи
 }
 
@@ -1063,7 +1101,6 @@ void K1804BC2::__special__1010(bool c0, const Operands* ops, ALUReasult* res, IL
 	}
 	uint8_t F = ops->S + c0;
 
-	// TODO load (сдвиги и тд)
 	// TODO логи
 }
 
@@ -1079,7 +1116,6 @@ void K1804BC2::__special__1100(bool c0, const Operands* ops, ALUReasult* res, IL
 	else
 		F = ops->S - ops->R - 1 + c0;
 
-	// TODO load (сдвиги и тд)
 	// TODO логи
 }
 
@@ -1095,15 +1131,14 @@ void K1804BC2::__special__1110(bool c0, const Operands* ops, ALUReasult* res, IL
 	else
 		F = ops->S - ops->R - 1 + c0;
 
-	// TODO load (сдвиги и тд)
 	// TODO логи
 }
 
 
 void K1804BC2::load(const CommandFields* cmd, ALUReasult* res, ILogger* log)
 {
-	setState(_time, _pin_PR3, 0);
-	setState(_time, _pin_PR0, 0);
+	setState(_time, _pin_PF3, 0);
+	setState(_time, _pin_PF0, 0);
 	setState(_time, _pin_PQ3, 0);
 	setState(_time, _pin_PQ0, 0);
 	switch (cmd->To)
@@ -1179,10 +1214,13 @@ void K1804BC2::load(const CommandFields* cmd, ALUReasult* res, ILogger* log)
 
 void K1804BC2::special(bool c0, const Operands* ops, const uint8_t code, ALUReasult* res, ILogger* log)
 {
+	// W = 0;
+	setState(_time, _pin_W_MSS, -1);
 	switch (code)
 	{
 	case 0:
 		__special__0000(c0, ops, res, log);
+		__special_load__0000(res, log);
 		break;
 	case 2:
 		__special__0010(c0, ops, res, log);
