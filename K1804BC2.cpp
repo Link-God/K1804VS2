@@ -74,8 +74,6 @@ VOID K1804BC2::setup(IINSTANCE* instance, IDSIMCKT* dsimckt)
 	setState(0, _pin_C4, 0);
 	_pin_Z = _inst->getdsimpin(const_cast<CHAR*>("Z"), true);
 	setState(0, _pin_Z, 0);
-	_pin_F3 = _inst->getdsimpin(const_cast<CHAR*>("F3"), true);
-	setState(0, _pin_F3, 0);
 	_pin_P_OVR = _inst->getdsimpin(const_cast<CHAR*>("P/OVR"), true);
 	setState(0, _pin_P_OVR, 0);
 	_pin_G_N = _inst->getdsimpin(const_cast<CHAR*>("G/N"), true);
@@ -256,7 +254,7 @@ void K1804BC2::__alu__0000(bool c0, bool i0, const Operands* ops, const uint8_t 
 	}
 	else
 	{
-		res->Y = 0b1111;
+		res->F = res->Y = 0b1111;
 		if (log != nullptr)
 		{
 			log->log("ALU: Y=1111");
@@ -272,7 +270,7 @@ void K1804BC2::__alu__0001(bool c0, const Operands* ops, ALUReasult* res, ILogge
 	{
 		return;
 	}
-	res->Y = ops->S - ops->R - 1 + c0;
+	res->F = res->Y = ops->S - ops->R - 1 + c0;
 	if (log != nullptr)
 	{
 		log->log("ALU: Y=S-R-1+C0=" + std::to_string(ops->S) + "-"
@@ -289,7 +287,7 @@ void K1804BC2::__alu__0010(bool c0, const Operands* ops, ALUReasult* res, ILogge
 	{
 		return;
 	}
-	res->Y = ops->R - ops->S - 1 + c0;
+	res->F = res->Y = ops->R - ops->S - 1 + c0;
 	if (log != nullptr)
 	{
 		log->log("ALU: Y=R-S-1+C0=" + std::to_string(ops->R) + "-"
@@ -305,7 +303,7 @@ void K1804BC2::__alu__0011(bool c0, const Operands* ops, ALUReasult* res, ILogge
 	{
 		return;
 	}
-	res->Y = ops->R + ops->S + c0;
+	res->F = res->Y = ops->R + ops->S + c0;
 	if (log != nullptr)
 	{
 		log->log("ALU: Y=R+S+C0=" + std::to_string(ops->R) + "+"
@@ -321,7 +319,7 @@ void K1804BC2::__alu__0100(bool c0, const Operands* ops, ALUReasult* res, ILogge
 	{
 		return;
 	}
-	res->Y = ops->S + c0;
+	res->F = res->Y = ops->S + c0;
 	if (log != nullptr)
 	{
 		log->log("ALU: Y=S+C0=" + std::to_string(ops->S) + "+" + std::to_string(c0) + "="
@@ -336,7 +334,7 @@ void K1804BC2::__alu__0101(bool c0, const Operands* ops, ALUReasult* res, ILogge
 	{
 		return;
 	}
-	res->Y = ~ops->S + c0;
+	res->F = res->Y = ~ops->S + c0;
 	if (log != nullptr)
 	{
 		log->log("ALU: Y=~S+C0=" + std::to_string(~ops->S) + "+" + std::to_string(c0) + "="
@@ -351,7 +349,7 @@ void K1804BC2::__alu__0110(bool c0, const Operands* ops, ALUReasult* res, ILogge
 	{
 		return;
 	}
-	res->Y = ops->R + c0;
+	res->F = res->Y = ops->R + c0;
 	if (log != nullptr)
 	{
 		log->log("ALU: Y=R+C0=" + std::to_string(ops->R) + "+" + std::to_string(c0) + "="
@@ -366,7 +364,7 @@ void K1804BC2::__alu__0111(bool c0, const Operands* ops, ALUReasult* res, ILogge
 	{
 		return;
 	}
-	res->Y = ~ops->R + c0;
+	res->F = res->Y = ~ops->R + c0;
 	if (log != nullptr)
 	{
 		log->log("ALU: Y=~S+C0=" + std::to_string(~ops->R) + "+" + std::to_string(c0) + "="
@@ -381,7 +379,7 @@ void K1804BC2::__alu__1000(bool c0, const Operands* ops, ALUReasult* res, ILogge
 	{
 		return;
 	}
-	res->Y = 0b0000;
+	res->F = res->Y = 0b0000;
 	if (log != nullptr)
 	{
 		log->log("ALU: Y=0000");
@@ -395,7 +393,7 @@ void K1804BC2::__alu__1001(bool c0, const Operands* ops, ALUReasult* res, ILogge
 	{
 		return;
 	}
-	res->Y = ~ops->R & ops->S;
+	res->F = res->Y = ~ops->R & ops->S;
 	if (log != nullptr)
 	{
 		log->log("ALU: Y=~R&S=" + std::to_string(~ops->R) + "&" + std::to_string(ops->S) + "="
@@ -410,7 +408,7 @@ void K1804BC2::__alu__1010(bool c0, const Operands* ops, ALUReasult* res, ILogge
 	{
 		return;
 	}
-	res->Y = ~(ops->R ^ ops->S);
+	res->F = res->Y = ~(ops->R ^ ops->S);
 	if (log != nullptr)
 	{
 		log->log("ALU: Y=~(R^S)=~(" + std::to_string(ops->R) + "^" + std::to_string(ops->S) + ")="
@@ -425,7 +423,7 @@ void K1804BC2::__alu__1011(bool c0, const Operands* ops, ALUReasult* res, ILogge
 	{
 		return;
 	}
-	res->Y = ops->R ^ ops->S;
+	res->F = res->Y = ops->R ^ ops->S;
 	if (log != nullptr)
 	{
 		log->log("ALU: Y=~(R^S)=" + std::to_string(ops->R) + "^" + std::to_string(ops->S) + "="
@@ -440,7 +438,7 @@ void K1804BC2::__alu__1100(bool c0, const Operands* ops, ALUReasult* res, ILogge
 	{
 		return;
 	}
-	res->Y = ops->R & ops->S;
+	res->F = res->Y = ops->R & ops->S;
 	if (log != nullptr)
 	{
 		log->log("ALU: Y=R&S=" + std::to_string(ops->R) + "&" + std::to_string(ops->S) + "="
@@ -455,7 +453,7 @@ void K1804BC2::__alu__1101(bool c0, const Operands* ops, ALUReasult* res, ILogge
 	{
 		return;
 	}
-	res->Y = ~(ops->R | ops->S);
+	res->F = res->Y = ~(ops->R | ops->S);
 	if (log != nullptr)
 	{
 		log->log("ALU: Y=~(R|S)=~(" + std::to_string(ops->R) + "|" + std::to_string(ops->S) + ")="
@@ -470,7 +468,7 @@ void K1804BC2::__alu__1110(bool c0, const Operands* ops, ALUReasult* res, ILogge
 	{
 		return;
 	}
-	res->Y = ~(ops->R & ops->S);
+	res->F = res->Y = ~(ops->R & ops->S);
 	if (log != nullptr)
 	{
 		log->log("ALU: Y=~(R&S)=~(" + std::to_string(ops->R) + "&" + std::to_string(ops->S) + ")="
@@ -485,7 +483,7 @@ void K1804BC2::__alu__1111(bool c0, const Operands* ops, ALUReasult* res, ILogge
 	{
 		return;
 	}
-	res->Y = ops->R | ops->S;
+	res->F = res->Y = ops->R | ops->S;
 	if (log != nullptr)
 	{
 		log->log("ALU: Y=R|S=" + std::to_string(ops->R) + "|" + std::to_string(ops->S) + "="
@@ -582,22 +580,26 @@ void K1804BC2::__load__0000(const CommandFields* cmd, ALUReasult* res, ILogger* 
 		return;
 	}
 	uint8_t y = res->Y;
-	if (cmd->position == OLD) {
+	if (cmd->position == OLD)
+	{
 		isHigh(_pin_PF3) ? y |= 0b0100 : y &= 0b1011;
-		res->Y & 0b0100  ? y |= 0b0010 : y &= 0b1101;
-		res->Y & 0b0010  ? y |= 0b0001 : y &= 0b1110;
-	} else {
+		res->Y & 0b0100 ? y |= 0b0010 : y &= 0b1101;
+		res->Y & 0b0010 ? y |= 0b0001 : y &= 0b1110;
+	}
+	else
+	{
 		isHigh(_pin_PF3) ? y |= 0b1000 : y &= 0b0111;
-		res->Y & 0b1000  ? y |= 0b0100 : y &= 0b1011;
-		res->Y & 0b0100  ? y |= 0b0010 : y &= 0b1101;
-		res->Y & 0b0010  ? y |= 0b0001 : y &= 0b1110;
+		res->Y & 0b1000 ? y |= 0b0100 : y &= 0b1011;
+		res->Y & 0b0100 ? y |= 0b0010 : y &= 0b1101;
+		res->Y & 0b0010 ? y |= 0b0001 : y &= 0b1110;
 	}
 	res->Y & 0b0001 ? setState(_time, _pin_PF0, 1) : setState(_time, _pin_PF0, -1);
 	setState(_time, _pin_PQ0, 0);
 	setState(_time, _pin_PQ3, 0);
-	res->Y = (y) & 0b1111;
-	if (log != nullptr) {
-		log->log("Load: Y->Y/2=" + std::to_string(res->Y & 0b1111) + " Q - hold";
+	res->Y = y & 0b1111;
+	if (log != nullptr)
+	{
+		log->log("Load: Y->Y/2=" + std::to_string(res->Y & 0b1111) + " Q - hold");
 	}
 }
 
@@ -614,8 +616,9 @@ void K1804BC2::__load__0001(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	setState(_time, _pin_PQ0, 0);
 	setState(_time, _pin_PQ3, 0);
 	res->Y = (y) & 0b1111;
-	if (log != nullptr) {
-		log->log("Load: Y->Y/2=" + std::to_string(res->Y & 0b1111) + " Q - hold";
+	if (log != nullptr)
+	{
+		log->log("Load: Y->Y/2=" + std::to_string(res->Y & 0b1111) + " Q - hold");
 	}
 }
 
@@ -627,33 +630,36 @@ void K1804BC2::__load__0010(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	}
 
 	uint8_t y = res->Y;
-	if (cmd->position == OLD) {
+	if (cmd->position == OLD)
+	{
 		isHigh(_pin_PF3) ? y |= 0b0100 : y &= 0b1011;
-		res->Y & 0b0100  ? y |= 0b0010 : y &= 0b1101;
-		res->Y & 0b0010  ? y |= 0b0001 : y &= 0b1110;
-	} else {
+		res->Y & 0b0100 ? y |= 0b0010 : y &= 0b1101;
+		res->Y & 0b0010 ? y |= 0b0001 : y &= 0b1110;
+	}
+	else
+	{
 		isHigh(_pin_PF3) ? y |= 0b1000 : y &= 0b0111;
-		res->Y & 0b1000  ? y |= 0b0100 : y &= 0b1011;
-		res->Y & 0b0100  ? y |= 0b0010 : y &= 0b1101;
-		res->Y & 0b0010  ? y |= 0b0001 : y &= 0b1110;
+		res->Y & 0b1000 ? y |= 0b0100 : y &= 0b1011;
+		res->Y & 0b0100 ? y |= 0b0010 : y &= 0b1101;
+		res->Y & 0b0010 ? y |= 0b0001 : y &= 0b1110;
 	}
 	res->Y & 0b0001 ? setState(_time, _pin_PF0, 1) : setState(_time, _pin_PF0, -1);
 
 	res->Y = (y) & 0b1111;
 
-	if (isLow(_pin_IEN)) 
+	if (isLow(_pin_IEN))
 	{
 		uint8_t pq = _reg_q >> 1;
 		isHigh(_pin_PQ3) ? pq |= 0b1000 : pq & 0b0111;
 		_reg_q & 0b0001 ? setState(_time, _pin_PQ0, 1) : setState(_time, _pin_PQ0, -1);
 		_reg_q = (pq) & 0b1111;
 	}
-	
-	if (log != nullptr) {
-		log->log("Load: Y->Y/2=" + std::to_string(res->Y & 0b1111) + 
-		" Q -> Q/2=" + std::to_string(_reg_q);
-	}
 
+	if (log != nullptr)
+	{
+		log->log("Load: Y->Y/2=" + std::to_string(res->Y & 0b1111) +
+			" Q -> Q/2=" + std::to_string(_reg_q));
+	}
 }
 
 void K1804BC2::__load__0011(const CommandFields* cmd, ALUReasult* res, ILogger* log)
@@ -667,68 +673,77 @@ void K1804BC2::__load__0011(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	isHigh(_pin_PF3) ? y |= 0b1000 : y &= 0b0111;
 	res->Y & 0b0001 ? setState(_time, _pin_PF0, 1) : setState(_time, _pin_PF0, -1);
 	res->Y = (y) & 0b1111;
-	
-	if (isLow(_pin_IEN)) 
+
+	if (isLow(_pin_IEN))
 	{
 		uint8_t pq = _reg_q >> 1;
 		isHigh(_pin_PQ3) ? pq |= 0b1000 : pq & 0b0111;
 		_reg_q & 0b0001 ? setState(_time, _pin_PQ0, 1) : setState(_time, _pin_PQ0, -1);
 		_reg_q = (pq) & 0b1111;
 	}
-	
-	if (log != nullptr) {
-		log->log("Load: Y->Y/2=" + std::to_string(res->Y & 0b1111) + 
-		" Q -> Q/2=" + std::to_string(_reg_q);
+
+	if (log != nullptr)
+	{
+		log->log("Load: Y->Y/2=" + std::to_string(res->Y & 0b1111) +
+			" Q -> Q/2=" + std::to_string(_reg_q));
 	}
 }
 
 void K1804BC2::__load__0100(const CommandFields* cmd, ALUReasult* res, ILogger* log)
 {
-	if (cmd == nullptr || res == nullptr) 
+	if (cmd == nullptr || res == nullptr)
 	{
 		return;
 	}
-	bool parity = false;
-	if(isHigh(_pin_PF3)) {
-		parity =res->Y & 0b1000 ^ res->Y & 0b1000 ^ res->Y & 0b1000 ^ res->Y & 0b1000 ^ true;
-	} else {
-		parity =res->Y & 0b1000 ^ res->Y & 0b1000 ^ res->Y & 0b1000 ^ res->Y & 0b1000 ^ false;
+	bool parity;
+	if (isHigh(_pin_PF3))
+	{
+		parity = (res->Y & 0b1000) ^ (res->Y & 0b0100) ^ (res->Y & 0b0010) ^ (res->Y & 0b0001) ^ true;
+	}
+	else
+	{
+		parity = (res->Y & 0b1000) ^ (res->Y & 0b0100) ^ (res->Y & 0b0010) ^ (res->Y & 0b0001) ^ false;
 	}
 	parity == true ? setState(_time, _pin_PF0, 1) : setState(_time, _pin_PF0, -1);
 
 	setState(_time, _pin_PQ0, 0);
 	setState(_time, _pin_PQ3, 0);
-	if (log != nullptr) {
-		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) + " Q - hold";
+	if (log != nullptr)
+	{
+		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) + " Q - hold");
 	}
 }
 
 void K1804BC2::__load__0101(const CommandFields* cmd, ALUReasult* res, ILogger* log)
 {
-	if (cmd == nullptr || res == nullptr) 
+	if (cmd == nullptr || res == nullptr)
 	{
 		return;
 	}
-	
-	bool parity = false;
-	if(isHigh(_pin_PF3)) {
-		parity =res->Y & 0b1000 ^ res->Y & 0b1000 ^ res->Y & 0b1000 ^ res->Y & 0b1000 ^ true;
-	} else {
-		parity =res->Y & 0b1000 ^ res->Y & 0b1000 ^ res->Y & 0b1000 ^ res->Y & 0b1000 ^ false;
+
+	bool parity;
+	if (isHigh(_pin_PF3))
+	{
+		parity = (res->Y & 0b1000) ^ (res->Y & 0b0100) ^ (res->Y & 0b0010) ^ (res->Y & 0b0001) ^ true;
+	}
+	else
+	{
+		parity = (res->Y & 0b1000) ^ (res->Y & 0b0100) ^ (res->Y & 0b0010) ^ (res->Y & 0b0001) ^ false;
 	}
 	parity == true ? setState(_time, _pin_PF0, 1) : setState(_time, _pin_PF0, -1);
 
-	if (isLow(_pin_IEN)) 
+	if (isLow(_pin_IEN))
 	{
 		uint8_t pq = _reg_q >> 1;
 		isHigh(_pin_PQ3) ? pq |= 0b1000 : pq & 0b0111;
 		_reg_q & 0b0001 ? setState(_time, _pin_PQ0, 1) : setState(_time, _pin_PQ0, -1);
 		_reg_q = (pq) & 0b1111;
 	}
-	
-	if (log != nullptr) {
-		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) + 
-		" Q -> Q/2=" + std::to_string(_reg_q) ;
+
+	if (log != nullptr)
+	{
+		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) +
+			" Q -> Q/2=" + std::to_string(_reg_q));
 	}
 }
 
@@ -736,57 +751,63 @@ void K1804BC2::__load__0101(const CommandFields* cmd, ALUReasult* res, ILogger* 
 void K1804BC2::__load__0110(const CommandFields* cmd, ALUReasult* res, ILogger* log)
 {
 	// W flag == 1
-	if (cmd == nullptr || res == nullptr) 
+	if (cmd == nullptr || res == nullptr)
 	{
 		return;
 	}
 
-	bool parity = false;
-	if(isHigh(_pin_PF3)) {
-		parity =res->Y & 0b1000 ^ res->Y & 0b1000 ^ res->Y & 0b1000 ^ res->Y & 0b1000 ^ true;
-	} else {
-		parity =res->Y & 0b1000 ^ res->Y & 0b1000 ^ res->Y & 0b1000 ^ res->Y & 0b1000 ^ false;
+	bool parity;
+	if (isHigh(_pin_PF3))
+	{
+		parity = (res->Y & 0b1000) ^ (res->Y & 0b0100) ^ (res->Y & 0b0010) ^ (res->Y & 0b0001) ^ true;
+	}
+	else
+	{
+		parity = (res->Y & 0b1000) ^ (res->Y & 0b0100) ^ (res->Y & 0b0010) ^ (res->Y & 0b0001) ^ false;
 	}
 	parity == true ? setState(_time, _pin_PF0, 1) : setState(_time, _pin_PF0, -1);
 
-	if (isLow(_pin_IEN)) 
+	if (isLow(_pin_IEN))
 	{
-		uint8_t pq = (res->Y) & 0b1111;
-		_reg_q = (pq) & 0b1111;
+		_reg_q = (res->Y) & 0b1111;
 	}
 	setState(_time, _pin_PQ0, 0);
 	setState(_time, _pin_PQ3, 0);
 
-	if (log != nullptr) {
-		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) + " Y->Q=" + std::to_string(_reg_q);
+	if (log != nullptr)
+	{
+		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) + " Y->Q=" + std::to_string(_reg_q));
 	}
 }
 
 void K1804BC2::__load__0111(const CommandFields* cmd, ALUReasult* res, ILogger* log)
 {
 	// W flag == 0
-	if (cmd == nullptr || res == nullptr) 
+	if (cmd == nullptr || res == nullptr)
 	{
 		return;
 	}
 
-	bool parity = false;
-	if(isHigh(_pin_PF3)) {
-		parity =res->Y & 0b1000 ^ res->Y & 0b1000 ^ res->Y & 0b1000 ^ res->Y & 0b1000 ^ true;
-	} else {
-		parity =res->Y & 0b1000 ^ res->Y & 0b1000 ^ res->Y & 0b1000 ^ res->Y & 0b1000 ^ false;
-	}
-	parity == true ? setState(_time, _pin_PF0, 1) : setState(_time, _pin_PF0, -1)
-
-	if (isLow(_pin_IEN)) 
+	bool parity;
+	if (isHigh(_pin_PF3))
 	{
-		uint8_t pq = (res->Y) & 0b1111;
-		_reg_q = (pq) & 0b1111;
+		parity = (res->Y & 0b1000) ^ (res->Y & 0b0100) ^ (res->Y & 0b0010) ^ (res->Y & 0b0001) ^ true;
+	}
+	else
+	{
+		parity = (res->Y & 0b1000) ^ (res->Y & 0b0100) ^ (res->Y & 0b0010) ^ (res->Y & 0b0001) ^ false;
+	}
+	parity == true ? setState(_time, _pin_PF0, 1) : setState(_time, _pin_PF0, -1);
+
+	if (isLow(_pin_IEN))
+	{
+		_reg_q = (res->Y) & 0b1111;
 	}
 	setState(_time, _pin_PQ0, 0);
 	setState(_time, _pin_PQ3, 0);
-	if (log != nullptr) {
-		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) + " Y->Q=" + std::to_string(_reg_q);
+	if (log != nullptr)
+	{
+		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) + " Y->Q=" + std::to_string(_reg_q));
 	}
 }
 
@@ -798,23 +819,27 @@ void K1804BC2::__load__1000(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	}
 
 	uint8_t y = res->Y;
-	if (cmd->position == OLD) {
+	if (cmd->position == OLD)
+	{
 		isHigh(_pin_PF0) ? y |= 0b0001 : y &= 0b1110;
-		res->Y & 0b0001  ? y |= 0b0010 : y &= 0b1101;
-		res->Y & 0b0010  ? y |= 0b0100 : y &= 0b1011;
+		res->Y & 0b0001 ? y |= 0b0010 : y &= 0b1101;
+		res->Y & 0b0010 ? y |= 0b0100 : y &= 0b1011;
 		res->Y & 0b0100 ? setState(_time, _pin_PF3, 1) : setState(_time, _pin_PF3, -1);
-	} else {
+	}
+	else
+	{
 		isHigh(_pin_PF0) ? y |= 0b0001 : y &= 0b1110;
-		res->Y & 0b0001  ? y |= 0b0010 : y &= 0b1101;
-		res->Y & 0b0010  ? y |= 0b0100 : y &= 0b1011;
-		res->Y & 0b0100  ? y |= 0b1000 : y &= 0b0111;
+		res->Y & 0b0001 ? y |= 0b0010 : y &= 0b1101;
+		res->Y & 0b0010 ? y |= 0b0100 : y &= 0b1011;
+		res->Y & 0b0100 ? y |= 0b1000 : y &= 0b0111;
 		res->Y & 0b1000 ? setState(_time, _pin_PF3, 1) : setState(_time, _pin_PF3, -1);
 	}
 	setState(_time, _pin_PQ0, 0);
 	setState(_time, _pin_PQ3, 0);
 	res->Y = (y) & 0b1111;
-	if (log != nullptr) {
-		log->log("Load: Y->2Y=" + std::to_string(res->Y & 0b1111) + " Q - hold";
+	if (log != nullptr)
+	{
+		log->log("Load: Y->2Y=" + std::to_string(res->Y & 0b1111) + " Q - hold");
 	}
 }
 
@@ -829,10 +854,10 @@ void K1804BC2::__load__1001(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	res->Y & 0b1000 ? setState(_time, _pin_PF3, 1) : setState(_time, _pin_PF3, -1);
 	setState(_time, _pin_PQ0, 0);
 	setState(_time, _pin_PQ3, 0);
-	if (log != nullptr) {
-		log->log("Load: Y->2Y=" + std::to_string(res->Y & 0b1111) + " Q - hold";
+	if (log != nullptr)
+	{
+		log->log("Load: Y->2Y=" + std::to_string(res->Y & 0b1111) + " Q - hold");
 	}
-
 }
 
 void K1804BC2::__load__1010(const CommandFields* cmd, ALUReasult* res, ILogger* log)
@@ -843,22 +868,25 @@ void K1804BC2::__load__1010(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	}
 
 	uint8_t y = res->Y;
-	if (cmd->position == OLD) {
+	if (cmd->position == OLD)
+	{
 		isHigh(_pin_PF0) ? y |= 0b0001 : y &= 0b1110;
-		res->Y & 0b0001  ? y |= 0b0010 : y &= 0b1101;
-		res->Y & 0b0010  ? y |= 0b0100 : y &= 0b1011;
+		res->Y & 0b0001 ? y |= 0b0010 : y &= 0b1101;
+		res->Y & 0b0010 ? y |= 0b0100 : y &= 0b1011;
 		res->Y & 0b0100 ? setState(_time, _pin_PF3, 1) : setState(_time, _pin_PF3, -1);
-	} else {
+	}
+	else
+	{
 		isHigh(_pin_PF0) ? y |= 0b0001 : y &= 0b1110;
-		res->Y & 0b0001  ? y |= 0b0010 : y &= 0b1101;
-		res->Y & 0b0010  ? y |= 0b0100 : y &= 0b1011;
-		res->Y & 0b0100  ? y |= 0b1000 : y &= 0b0111;
+		res->Y & 0b0001 ? y |= 0b0010 : y &= 0b1101;
+		res->Y & 0b0010 ? y |= 0b0100 : y &= 0b1011;
+		res->Y & 0b0100 ? y |= 0b1000 : y &= 0b0111;
 		res->Y & 0b1000 ? setState(_time, _pin_PF3, 1) : setState(_time, _pin_PF3, -1);
 	}
-	res->Y = (y) & 0b1111;
+	res->Y = y & 0b1111;
 
 
-	if (isLow(_pin_IEN)) 
+	if (isLow(_pin_IEN))
 	{
 		uint8_t pq = _reg_q << 1;
 		isHigh(_pin_PQ0) ? pq |= 0b0001 : pq & 0b1110;
@@ -866,9 +894,10 @@ void K1804BC2::__load__1010(const CommandFields* cmd, ALUReasult* res, ILogger* 
 		_reg_q = (pq) & 0b1111;
 	}
 
-	if (log != nullptr) {
+	if (log != nullptr)
+	{
 		log->log("Load: Y->2Y=" + std::to_string(res->Y & 0b1111) +
-		 " Q->2Q=" + std::to_string(_reg_q);
+			" Q->2Q=" + std::to_string(_reg_q));
 	}
 }
 
@@ -882,7 +911,7 @@ void K1804BC2::__load__1011(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	res->Y = (y) & 0b1111;
 	res->Y & 0b1000 ? setState(_time, _pin_PF3, 1) : setState(_time, _pin_PF3, -1);
 
-	if (isLow(_pin_IEN)) 
+	if (isLow(_pin_IEN))
 	{
 		uint8_t pq = _reg_q << 1;
 		isHigh(_pin_PQ0) ? pq |= 0b0001 : pq & 0b1110;
@@ -890,15 +919,16 @@ void K1804BC2::__load__1011(const CommandFields* cmd, ALUReasult* res, ILogger* 
 		_reg_q = (pq) & 0b1111;
 	}
 
-	if (log != nullptr) {
+	if (log != nullptr)
+	{
 		log->log("Load: Y->2Y=" + std::to_string(res->Y & 0b1111) +
-		 " Q->2Q=" + std::to_string(_reg_q);
+			" Q->2Q=" + std::to_string(_reg_q));
 	}
 }
 
 void K1804BC2::__load__1100(const CommandFields* cmd, ALUReasult* res, ILogger* log)
 {
-	if (cmd == nullptr || res == nullptr) 
+	if (cmd == nullptr || res == nullptr)
 	{
 		return;
 	}
@@ -906,19 +936,20 @@ void K1804BC2::__load__1100(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	setState(_time, _pin_PF0, 0);
 	setState(_time, _pin_PQ0, 0);
 	setState(_time, _pin_PQ3, 0);
-	if (log != nullptr) {
-		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) + " Q - hold";
+	if (log != nullptr)
+	{
+		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) + " Q - hold");
 	}
 }
 
 void K1804BC2::__load__1101(const CommandFields* cmd, ALUReasult* res, ILogger* log)
 {
-	if (cmd == nullptr || res == nullptr) 
+	if (cmd == nullptr || res == nullptr)
 	{
 		return;
 	}
 
-	if (isLow(_pin_IEN)) 
+	if (isLow(_pin_IEN))
 	{
 		uint8_t pq = _reg_q << 1;
 		isHigh(_pin_PQ0) ? pq |= 0b0001 : pq & 0b1110;
@@ -928,15 +959,16 @@ void K1804BC2::__load__1101(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	res->Y & 0b1000 ? setState(_time, _pin_PF3, 1) : setState(_time, _pin_PF3, -1);
 	setState(_time, _pin_PF0, 0);
 
-	if (log != nullptr) {
+	if (log != nullptr)
+	{
 		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) +
-		 " Q->2Q=" + std::to_string(_reg_q);
+			" Q->2Q=" + std::to_string(_reg_q));
 	}
 }
 
 void K1804BC2::__load__1110(const CommandFields* cmd, ALUReasult* res, ILogger* log)
 {
-	if (cmd == nullptr || res == nullptr) 
+	if (cmd == nullptr || res == nullptr)
 	{
 		return;
 	}
@@ -947,14 +979,16 @@ void K1804BC2::__load__1110(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	isHigh(_pin_PF0) ? setState(_time, _pin_PF3, 1) : setState(_time, _pin_PF3, -1);
 	setState(_time, _pin_PQ0, 0);
 	setState(_time, _pin_PQ3, 0);
-	
-	if (log != nullptr) {
-		log->log("Load: PR0->Y[0,1,2,3]" + std::to_string(res->Y & 0b1111) + " Q - hold";
+
+	if (log != nullptr)
+	{
+		log->log("Load: PR0->Y[0,1,2,3]" + std::to_string(res->Y & 0b1111) + " Q - hold");
 	}
+}
 
 void K1804BC2::__load__1111(const CommandFields* cmd, ALUReasult* res, ILogger* log)
 {
-	if (cmd == nullptr || res == nullptr) 
+	if (cmd == nullptr || res == nullptr)
 	{
 		return;
 	}
@@ -962,64 +996,79 @@ void K1804BC2::__load__1111(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	res->Y & 0b1000 ? setState(_time, _pin_PF3, 1) : setState(_time, _pin_PF3, -1);
 	setState(_time, _pin_PQ0, 0);
 	setState(_time, _pin_PQ3, 0);
-	if (log != nullptr) {
-		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) + " Q - hold";
+	if (log != nullptr)
+	{
+		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) + " Q - hold");
 	}
 }
 
 // S+C0, если Z=0; R+S+C0, если Z=1;
-void K1804BC2::__special__0000(bool c0, const Operands* ops, ALUReasult* res, ILogger* log) {
+void K1804BC2::__special__0000(bool c0, const Operands* ops, ALUReasult* res, ILogger* log)
+{
 	if (ops == nullptr || res == nullptr)
 		return;
 
-	if (isLow(_pin_Z)) {
-		res->Y = ops->S + c0;
+	if (isLow(_pin_Z))
+	{
+		res->F = res->Y = ops->S + c0;
 		log->log("ALU_SPECIAL: Z=0, Y=S+C0=" + std::to_string(ops->S) +
 			"+" + std::to_string(c0) + "=" + std::to_string(res->Y));
-	} else {
-		res->Y = ops->R + ops->S + c0;
-		log->log("ALU_SPECIAL: Z=1, Y=R+S+C0=" + std::to_string(ops->R) + 
-			"+" + std::to_string(ops->S) + "+" + std::to_string(c0) + 
+	}
+	else
+	{
+		res->F = res->Y = ops->R + ops->S + c0;
+		log->log("ALU_SPECIAL: Z=1, Y=R+S+C0=" + std::to_string(ops->R) +
+			"+" + std::to_string(ops->S) + "+" + std::to_string(c0) +
 			"=" + std::to_string(res->Y));
 	}
 }
 
 // Лог. F/2->Y, Лог. Q/2->Q
-void K1804BC2::__special_load__0000(ALUReasult* res, ILogger* log) {
+void K1804BC2::__special_load__0000(ALUReasult* res, ILogger* log)
+{
 	if (res == nullptr)
 		return;
 	std::string msg = "LOAD SP: Лог. F/2->Y, Лог. Q/2->Q\n";
 	// PF0=F0
-	if ((res->Y & 0b0001)) {
+	if (res->Y & 0b0001)
+	{
 		setState(_time, _pin_PF0, 1); // PF0 = 1
 		msg += "PF0=1,";
-	} else {
+	}
+	else
+	{
 		setState(_time, _pin_PF0, -1); // PF0 = 0
 		msg += "PF0=0,";
 	}
 	// Y=F/2
 	res->Y = res->Y >> 1;
 	// Если не старшая МПС, то PF3 вход
-	if (_pos != OLD) {
+	if (_pos != OLD)
+	{
 		// F3 = PF3
-		if (isHigh(_pin_PF3)) {
+		if (isHigh(_pin_PF3))
+		{
 			res->Y |= 0b1000; // F3 = 1
 			msg += "F3=PF3=1,";
 		}
 	}
 	msg += "F=F/2=" + std::to_string(res->Y) + "\n";
 	// PQ0=Q0
-	if ((_reg_q & 0b0001)) {
+	if (_reg_q & 0b000)
+	{
 		setState(_time, _pin_PQ0, 1); // PQ0 = 1
 		msg += "PQ0=1,";
-	} else {
+	}
+	else
+	{
 		setState(_time, _pin_PQ0, -1); // PQ0 = 0
 		msg += "PQ0=0,";
 	}
 	// Q=Q/2
 	_reg_q = _reg_q >> 1;
 	// Q3 = PQ3
-	if (isHigh(_pin_PQ3)) {
+	if (isHigh(_pin_PQ3))
+	{
 		_reg_q |= 0b1000; // Q3 = 1
 		msg += "Q3=PQ3=1,";
 	}
@@ -1215,7 +1264,8 @@ void K1804BC2::load(const CommandFields* cmd, ALUReasult* res, ILogger* log)
 void K1804BC2::special(bool c0, const Operands* ops, const uint8_t code, ALUReasult* res, ILogger* log)
 {
 	// W = 0;
-	setState(_time, _pin_W_MSS, -1);
+	if(isLow(_pin_LSS))
+		setState(_time, _pin_W_MSS, -1);
 	switch (code)
 	{
 	case 0:
@@ -1271,10 +1321,10 @@ VOID K1804BC2::simulate(ABSTIME time, DSIMMODES mode)
 		// выставление флагов
 		// Z - I/O
 		//_reg_z = result->Z;
-		_reg_f3 = result->F3;
 		_reg_c4 = result->C4;
 		_reg_p_ovr = result->P_OVR;
 		_reg_g_n = result->G_N;
+
 		// загрузка результов
 		load(cmd, result, log);
 		// логирование
@@ -1284,7 +1334,7 @@ VOID K1804BC2::simulate(ABSTIME time, DSIMMODES mode)
 		delete ops;
 		delete cmd;
 	}
-
+	// TODO флаги на пинах
 
 	delete log;
 }
@@ -1338,9 +1388,418 @@ void K1804BC2::setState(ABSTIME time, IDSIMPIN* pin, int set)
 	}
 }
 
-void K1804BC2::computeFlags(ALUReasult* res, bool c0, const Operands* ops, uint8_t aluCode)
+bool K1804BC2::compute_G(uint8_t G, uint8_t P)
 {
-	// TODO
+	return G & 0b1000 || (G & 0100 && P & 0b1000) || (G & 0b0010 && P & 0b0100 && P & 0b1000) ||
+		(G & 0b0001 && P & 0b0010 && P & 0b0100 && P & 0b1000);
+}
+
+bool K1804BC2::compute_P(uint8_t P)
+{
+	return P & 0b0001 && P & 0b0010 && P & 0b0100 && P & 0b1000;
+}
+
+bool K1804BC2::compute_C3(bool c0, uint8_t G, uint8_t P)
+{
+	return G & 0b0100 || G & 0b0010 && P & 0b0100 || G & 0b0001 && P & 0b0010 && P & 0b0100 ||
+		c0 && P & 0b0001 && P & 0b0010 && P & 0b0100;
+}
+
+
+void K1804BC2::computeFlags(bool special, ALUReasult* res, bool c0, const Operands* ops, uint8_t code)
+{
+	uint8_t G;
+	uint8_t P;
+	if (!special)
+	{
+		switch (code)
+		{
+		case 0:
+			G = 0b0000;
+			res->C4 = false;
+			res->P_OVR = false;
+			if (_pos == OLD)
+				res->G_N = res->F & 0b1000;
+			else
+				res->G_N = !compute_G(G, 0b1111);
+			res->Z = !(res->Y & 0b1111);
+			break;
+		case 1:
+			G = ~ops->R & ops->S;
+			P = ~ops->R | ops->S;
+			res->C4 = compute_G(G, P) || compute_P(P) && c0;
+			if (_pos == OLD)
+			{
+				res->P_OVR = compute_C3(c0, G, P) != res->C4;
+				res->G_N = res->F & 0b1000;
+			}
+			else
+			{
+				res->P_OVR = !compute_P(P);
+				res->G_N = !compute_G(G, P);
+			}
+			res->Z = !(res->Y & 0b1111);
+			break;
+		case 2:
+			G = ops->R & ~ops->S;
+			P = ops->R | ~ops->S;
+			res->C4 = compute_G(G, P) || compute_P(P) && c0;
+			if (_pos == OLD)
+			{
+				res->P_OVR = compute_C3(c0, G, P) != res->C4;
+				res->G_N = res->F & 0b1000;
+			}
+			else
+			{
+				res->P_OVR = !compute_P(P);
+				res->G_N = !compute_G(G, P);
+			}
+			res->Z = !(res->Y & 0b1111);
+			break;
+		case 3:
+			G = ops->R & ops->S;
+			P = ops->R | ops->S;
+			res->C4 = compute_G(G, P) || compute_P(P) && c0;
+			if (_pos == OLD)
+			{
+				res->P_OVR = compute_C3(c0, G, P) != res->C4;
+				res->G_N = res->F & 0b1000;
+			}
+			else
+			{
+				res->P_OVR = !compute_P(P);
+				res->G_N = !compute_G(G, P);
+			}
+			res->Z = !(res->Y & 0b1111);
+			break;
+		case 4:
+			G = 0b0000;
+			P = ops->S;
+			res->C4 = compute_G(G, P) || compute_P(P) && c0;
+			if (_pos == OLD)
+			{
+				res->P_OVR = compute_C3(c0, G, P) != res->C4;
+				res->G_N = res->F & 0b1000;
+			}
+			else
+			{
+				res->P_OVR = !compute_P(P);
+				res->G_N = !compute_G(G, P);
+			}
+			res->Z = !(res->Y & 0b1111);
+			break;
+		case 5:
+			G = 0b0000;
+			P = ~ops->S;
+			res->C4 = compute_G(G, P) || compute_P(P) && c0;
+			if (_pos == OLD)
+			{
+				res->P_OVR = compute_C3(c0, G, P) != res->C4;
+				res->G_N = res->F & 0b1000;
+			}
+			else
+			{
+				res->P_OVR = !compute_P(P);
+				res->G_N = !compute_G(G, P);
+			}
+			res->Z = !(res->Y & 0b1111);
+			break;
+
+		case 6:
+			G = 0b0000;
+			P = ops->R;
+			res->C4 = compute_G(G, P) || compute_P(P) && c0;
+			if (_pos == OLD)
+			{
+				res->P_OVR = compute_C3(c0, G, P) != res->C4;
+				res->G_N = res->F & 0b1000;
+			}
+			else
+			{
+				res->P_OVR = !compute_P(P);
+				res->G_N = !compute_G(G, P);
+			}
+			res->Z = !(res->Y & 0b1111);
+			break;
+		case 7:
+			G = 0b0000;
+			P = ~ops->R;
+			res->C4 = compute_G(G, P) || compute_P(P) && c0;
+			if (_pos == OLD)
+			{
+				res->P_OVR = compute_C3(c0, G, P) != res->C4;
+				res->G_N = res->F & 0b1000;
+			}
+			else
+			{
+				res->P_OVR = !compute_P(P);
+				res->G_N = !compute_G(G, P);
+			}
+			res->Z = !(res->Y & 0b1111);
+			break;
+		case 8:
+			G = 0b0000;
+			P = 0b1111;
+			res->C4 = false;
+			res->P_OVR = false;
+			if (_pos == OLD)
+				res->G_N = res->F & 0b1000;
+			else
+				res->G_N = !compute_G(G, P);
+			res->Z = !(res->Y & 0b1111);
+			break;
+		case 9:
+			G = ~ops->R & ops->S;
+			P = 0b1111;
+			res->C4 = false;
+			res->P_OVR = false;
+			if (_pos == OLD)
+				res->G_N = res->F & 0b1000;
+			else
+				res->G_N = !compute_G(G, P);
+			res->Z = !(res->Y & 0b1111);
+			break;
+		case 10:
+			G = ops->R & ops->S;
+			P = ops->R | ops->S;
+			res->C4 = false;
+			res->P_OVR = false;
+			if (_pos == OLD)
+				res->G_N = res->F & 0b1000;
+			else
+				res->G_N = !compute_G(G, P);
+			res->Z = !(res->Y & 0b1111);
+			break;
+		case 11:
+			G = ~ops->R & ops->S;
+			P = ~ops->R | ops->S;
+			res->C4 = false;
+			res->P_OVR = false;
+			if (_pos == OLD)
+				res->G_N = res->F & 0b1000;
+			else
+				res->G_N = !compute_G(G, P);
+			res->Z = !(res->Y & 0b1111);
+			break;
+		case 12:
+			G = ops->R & ops->S;
+			P = 0b1111;
+			res->C4 = false;
+			res->P_OVR = false;
+			if (_pos == OLD)
+				res->G_N = res->F & 0b1000;
+			else
+				res->G_N = !compute_G(G, P);
+			res->Z = !(res->Y & 0b1111);
+			break;
+		case 13:
+			G = ~ops->R & ~ops->S;
+			P = 0b1111;
+			res->C4 = false;
+			res->P_OVR = false;
+			if (_pos == OLD)
+				res->G_N = res->F & 0b1000;
+			else
+				res->G_N = !compute_G(G, P);
+			res->Z = !(res->Y & 0b1111);
+			break;
+		case 14:
+			G = ops->R & ops->S;
+			P = 0b1111;
+			res->C4 = false;
+			res->P_OVR = false;
+			if (_pos == OLD)
+				res->G_N = res->F & 0b1000;
+			else
+				res->G_N = !compute_G(G, P);
+			res->Z = !(res->Y & 0b1111);
+			break;
+		case 15:
+			G = ~ops->R & ~ops->S;
+			P = 0b1111;
+			res->C4 = false;
+			res->P_OVR = false;
+			if (_pos == OLD)
+				res->G_N = res->F & 0b1000;
+			else
+				res->G_N = !compute_G(G, P);
+			res->Z = !(res->Y & 0b1111);
+			break;
+		}
+	}
+	else
+	{
+		switch (code)
+		{
+		case 0:
+			if (_pos == YOUNG)
+				res->Z = _reg_q & 0b0001;
+			else
+				res->Z = isHigh(_pin_Z);
+			if (!res->Z)
+			{
+				G = 0b0000;
+				P = ops->S;
+			}
+			else
+			{
+				G = ops->R & ops->S;
+				P = ops->R | ops->S;
+			}
+			res->C4 = compute_G(G, P) || compute_P(P) && c0;
+			if(_pos == OLD)
+			{
+				res->P_OVR = compute_C3(c0, G, P) != res->C4;
+				res->G_N = res->F & 0b1000;
+			}
+			else
+			{
+				res->P_OVR = !compute_P(P);
+				res->G_N = !compute_G(G, P);
+			}
+			break;
+		case 2:
+			if (_pos == YOUNG)
+				res->Z = _reg_q & 0b0001;
+			else
+				res->Z = isHigh(_pin_Z);
+			if (!res->Z)
+			{
+				G = 0b0000;
+				P = ops->S;
+			}
+			else
+			{
+				G = ops->R & ops->S;
+				P = ops->R | ops->S;
+			}
+			res->C4 = compute_G(G, P) || compute_P(P) && c0;
+			if (_pos == OLD)
+			{
+				res->P_OVR = compute_C3(c0, G, P) != res->C4;
+				res->G_N = res->F & 0b1000;
+			}
+			else
+			{
+				res->P_OVR = !compute_P(P);
+				res->G_N = !compute_G(G, P);
+			}
+			break;
+		case 4:
+			if(isLow(_pin_LSS))
+			{
+				G = ops->S & 0b0001;
+				P = ops->S | 0b0001;
+			}
+			else
+			{
+				G = 0b0000;
+				P = ops->S;
+			}
+			res->C4 = compute_G(G, P) || compute_P(P) && c0;
+			if (_pos == OLD)
+			{
+				res->P_OVR = compute_C3(c0, G, P) != res->C4;
+				res->G_N = res->F & 0b1000;
+			}
+			else
+			{
+				res->P_OVR = !compute_P(P);
+				res->G_N = !compute_G(G, P);
+			}
+			break;
+		case 5:
+			G = 0b0000;
+			if (_pos == OLD)
+				res->Z = ops->S & 0b1000;
+			else
+				res->Z = isHigh(_pin_Z);
+			if (!res->Z)
+			{
+				P = ops->S;
+				res->G_N = res->F & 0b1000;
+			}
+			else
+			{
+				P = ~ops->S;
+				res->G_N = static_cast<bool>(res->F & 0b1000) != static_cast<bool>(ops->S & 0b1000);
+			}
+			res->C4 = compute_G(G, P) || compute_P(P) && c0;
+			if(_pos == OLD)
+			{
+				res->P_OVR = compute_C3(c0, G, P) != res->C4;
+			}
+			else
+			{
+				res->P_OVR = !compute_P(P);
+				res->G_N = !compute_G(G, P);
+			}
+			break;
+		case 6:
+			if (_pos == YOUNG)
+				res->Z = _reg_q & 0b0001;
+			else
+				res->Z = isHigh(_pin_Z);
+			if (!res->Z)
+			{
+				G = 0b0000;
+				P = ops->S;
+			}
+			else
+			{
+				G = ~ops->R & ops->S;
+				P = ~ops->R | ops->S;
+			}
+			res->C4 = compute_G(G, P) || compute_P(P) && c0;
+			if (_pos == OLD)
+			{
+				res->P_OVR = compute_C3(c0, G, P) != res->C4;
+				res->G_N = res->F & 0b1000;
+			}
+			else
+			{
+				res->P_OVR = !compute_P(P);
+				res->G_N = !compute_G(G, P);
+			}
+			break;
+		case 8:
+			G = 0b0000;
+			P = ops->S;
+			if(_pos == OLD)
+			{
+				res->C4 = static_cast<bool>(_reg_q & 0b1000) != static_cast<bool>(_reg_q & 0b0100);
+				res->P_OVR = static_cast<bool>(_reg_q & 0b0010) != static_cast<bool>(_reg_q & 0b0001);
+				res->G_N = _reg_q & 0b01000;
+			}
+			else
+			{
+				res->C4 = compute_G(G, P) || compute_P(P) && c0;
+				res->P_OVR = !compute_P(P);
+				res->G_N = !compute_G(G, P);
+			}
+			res->Z = !(_reg_q & 0b1111);
+			break;
+		case 10:
+			G = 0b0000;
+			P = ops->S;
+			if (_pos == OLD)
+			{
+				res->C4 = static_cast<bool>(res->F & 0b1000) != static_cast<bool>(res->F & 0b0100);
+				res->P_OVR = static_cast<bool>(res->F & 0b0010) != static_cast<bool>(res->F & 0b0001);
+				res->G_N = res->F & 0b01000;
+			}
+			else
+			{
+				res->C4 = compute_G(G, P) || compute_P(P) && c0;
+				res->P_OVR = !compute_P(P);
+				res->G_N = !compute_G(G, P);
+			}
+			res->Z = !((_reg_q & 0b1111) | (res->F & 0b1111));
+			break;
+		//case 12:
+			//TODO
+		}
+	}
 }
 
 INT K1804BC2::isdigital(CHAR* pinname)

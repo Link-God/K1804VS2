@@ -30,6 +30,7 @@ class K1804BC2 : public IDSIMMODEL
 	bool _reg_c4;
 	bool _reg_p_ovr;
 	bool _reg_g_n;
+	bool _reg_sign;
 	IDSIMPIN* _pin_A[REGISTER_SIZE];
 	IDSIMPIN* _pin_B[REGISTER_SIZE];
 	IDSIMPIN* _pin_DA[REGISTER_SIZE];
@@ -43,7 +44,6 @@ class K1804BC2 : public IDSIMMODEL
 	IDSIMPIN* _pin_Y[REGISTER_SIZE];
 	IDSIMPIN* _pin_C4;
 	IDSIMPIN* _pin_Z;
-	IDSIMPIN* _pin_F3;
 	IDSIMPIN* _pin_P_OVR;
 	IDSIMPIN* _pin_G_N;
 	IDSIMPIN* _pin_PF0;
@@ -94,12 +94,12 @@ class K1804BC2 : public IDSIMMODEL
 
 	struct ALUReasult
 	{
-		uint8_t Y; // Результат Алу
+		uint8_t Y; // ВЫход Y
 		bool P_OVR; // Переполнение
 		bool C4; // Перенос из старшего разряда
-		bool F3; // Знак, содержимое старшего разряда АЛУ
 		bool Z; // Признак нулевого результата
 		bool G_N; // Сигнал генерации переноса из АЛУ
+		uint8_t F; // Результат Алу
 	};
 
 	ALUReasult* ALU(bool c0, uint8_t code, const Operands* ops, ILogger* log);
@@ -166,8 +166,10 @@ class K1804BC2 : public IDSIMMODEL
 	void __special_load__1100(ALUReasult* res, ILogger* log);
 	void __special_load__1110(ALUReasult* res, ILogger* log);
 
-	void computeFlags(ALUReasult* res, bool c0, const Operands* ops, uint8_t aluCode);
-	// можно наверное поменять структуру
+	void computeFlags(bool special, ALUReasult* res, bool c0, const Operands* ops, uint8_t code);
+	bool compute_G(uint8_t G, uint8_t P);
+	bool compute_C3(bool c0, uint8_t G, uint8_t P);
+	bool compute_P(uint8_t P);
 	int getPosition();
 public:
 	INT isdigital(CHAR* pinname);
