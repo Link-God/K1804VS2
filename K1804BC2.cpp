@@ -83,9 +83,10 @@ VOID K1804BC2::setup(IINSTANCE* instance, IDSIMCKT* dsimckt)
 K1804BC2::CommandFields* K1804BC2::getCommand()
 {
 	CommandFields* cmd = new CommandFields();
-	cmd->From = (isHigh(_pin_EA) << 2) | (isHigh(_pin_I[0]) << 1) | isHigh(_pin_OEB);
-	cmd->Alu = genValue(_pin_I, 5, 1);
-	cmd->To = genValue(_pin_I, 9, 5);
+	cmd->From = (static_cast<int>(isHigh(_pin_EA)) << 2) | static_cast<int>((isHigh(_pin_I[0]) << 1))
+	| static_cast<int>(isHigh(_pin_OEB));
+	cmd->Alu = genValue(_pin_I, 4);
+	cmd->To = genValue(_pin_I, 4, 5);
 	cmd->A = genValue(_pin_A, REGISTER_SIZE);
 	cmd->B = genValue(_pin_B, REGISTER_SIZE);
 	cmd->DA = genValue(_pin_DA, REGISTER_SIZE);
@@ -495,7 +496,7 @@ K1804BC2::ALUReasult* K1804BC2::ALU(bool c0, uint8_t code, const Operands* ops, 
 		return nullptr;
 	}
 	auto res = new ALUReasult();
-	auto special_code = genValue(_pin_I, 9, 5);
+	auto special_code = genValue(_pin_I, 4, 5);
 	auto I0 = isHigh(_pin_I[0]);
 
 	switch (code)
@@ -1861,7 +1862,7 @@ void K1804BC2::special(bool c0, const Operands* ops, const uint8_t code, ALUReas
 		computeFlags(_special, res, c0, ops, code);
 		break;
 	default:
-		log->log("Not defined");
+		log->log(std::to_string(code) + "Not defined");
 		break;
 	}
 }
