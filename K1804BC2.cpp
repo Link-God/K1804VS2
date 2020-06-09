@@ -614,7 +614,7 @@ void K1804BC2::__load__0000(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	res->Y = y & 0b1111;
 	if (log != nullptr)
 	{
-		log->log("Load: F/2->Y=" + std::to_string(res->Y & 0b1111) + " Q - hold");
+		log->log("Load: Arith. F/2->Y=" + std::to_string(res->Y & 0b1111) + " Q - hold");
 	}
 }
 
@@ -633,7 +633,7 @@ void K1804BC2::__load__0001(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	res->Y = (y) & 0b1111;
 	if (log != nullptr)
 	{
-		log->log("Load: F/2->Y=" + std::to_string(res->Y & 0b1111) + " Q - hold");
+		log->log("Load: Log. F/2->Y=" + std::to_string(res->Y & 0b1111) + " Q - hold");
 	}
 }
 
@@ -672,8 +672,8 @@ void K1804BC2::__load__0010(const CommandFields* cmd, ALUReasult* res, ILogger* 
 
 	if (log != nullptr)
 	{
-		log->log("Load: F/2->Y=" + std::to_string(res->Y & 0b1111) +
-			"Q/2->Q=" + std::to_string(_reg_q));
+		log->log("Load: Arith. F/2->Y=" + std::to_string(res->Y & 0b1111) +
+			"Arith. Q/2->Q=" + std::to_string(_reg_q));
 	}
 }
 
@@ -699,8 +699,8 @@ void K1804BC2::__load__0011(const CommandFields* cmd, ALUReasult* res, ILogger* 
 
 	if (log != nullptr)
 	{
-		log->log("Load: F/2->Y=" + std::to_string(res->Y & 0b1111) +
-			"Q/2->Q=" + std::to_string(_reg_q));
+		log->log("Load: Log. F/2->Y=" + std::to_string(res->Y & 0b1111) +
+			"Log. Q/2->Q=" + std::to_string(_reg_q));
 	}
 }
 
@@ -767,7 +767,7 @@ void K1804BC2::__load__0101(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	if (log != nullptr)
 	{
 		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) +
-			" Q/2->Q=" + std::to_string(_reg_q));
+			"Log. Q/2->Q=" + std::to_string(_reg_q));
 	}
 }
 
@@ -869,7 +869,7 @@ void K1804BC2::__load__1000(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	res->Y = (y) & 0b1111;
 	if (log != nullptr)
 	{
-		log->log("Load: 2F->Y=" + std::to_string(res->Y & 0b1111) + " Q - hold");
+		log->log("Load:Arith. 2F->Y=" + std::to_string(res->Y & 0b1111) + " Q - hold");
 	}
 }
 
@@ -887,7 +887,7 @@ void K1804BC2::__load__1001(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	setState(_time, _pin_PQ3, 0);
 	if (log != nullptr)
 	{
-		log->log("Load: 2F->Y=" + std::to_string(res->Y & 0b1111) + " Q - hold");
+		log->log("Load:Log. 2F->Y=" + std::to_string(res->Y & 0b1111) + " Q - hold");
 	}
 }
 
@@ -926,8 +926,8 @@ void K1804BC2::__load__1010(const CommandFields* cmd, ALUReasult* res, ILogger* 
 
 	if (log != nullptr)
 	{
-		log->log("Load: 2F->Y=" + std::to_string(res->Y & 0b1111) +
-			" 2Q->Q=" + std::to_string(_reg_q));
+		log->log("Load:Arith. 2F->Y=" + std::to_string(res->Y & 0b1111) +
+			"Log. 2Q->Q=" + std::to_string(_reg_q));
 	}
 }
 
@@ -952,8 +952,8 @@ void K1804BC2::__load__1011(const CommandFields* cmd, ALUReasult* res, ILogger* 
 
 	if (log != nullptr)
 	{
-		log->log("Load: 2F->Y=" + std::to_string(res->Y & 0b1111) +
-			" 2Q->Q=" + std::to_string(_reg_q));
+		log->log("Load:Log. 2F->Y=" + std::to_string(res->Y & 0b1111) +
+			"Log. 2Q->Q=" + std::to_string(_reg_q));
 	}
 }
 
@@ -995,7 +995,7 @@ void K1804BC2::__load__1101(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	if (log != nullptr)
 	{
 		log->log("Load: F->Y=" + std::to_string(res->Y & 0b1111) +
-			" 2Q->Q=" + std::to_string(_reg_q));
+			"Log. 2Q->Q=" + std::to_string(_reg_q));
 	}
 }
 
@@ -1042,7 +1042,7 @@ void K1804BC2::__special__0000(bool c0, const Operands* ops, ALUReasult* res, IL
 	if (ops == nullptr || res == nullptr)
 		return;
 
-	std::string msg = "Лог. Q/2->Q \n";
+	std::string msg = "Log. Q/2->Q \n";
 	// PQ0=Q0
 	if (_reg_q & 0b0001)
 	{
@@ -1090,12 +1090,12 @@ void K1804BC2::__special__0000(bool c0, const Operands* ops, ALUReasult* res, IL
 	}
 }
 
-// Лог. F/2->Y, Лог. Q/2->Q; старшая МПС: Y3 = C4
+// Log. F/2->Y, Log. Q/2->Q; старшая МПС: Y3 = C4
 void K1804BC2::__special_load__0000(ALUReasult* res, ILogger* log)
 {
 	if (res == nullptr)
 		return;
-	std::string msg = "LOAD SP: Лог. F/2->Y\n";
+	std::string msg = "LOAD SP: Log. F/2->Y\n";
 	// PF0=F0
 	if (res->F & 0b0001)
 	{
@@ -1154,7 +1154,7 @@ void K1804BC2::__special__0010(bool c0, const Operands* ops, ALUReasult* res, IL
 	if (ops == nullptr || res == nullptr)
 		return;
 
-	std::string msg = "Лог. Q/2->Q \n";
+	std::string msg = "Log. Q/2->Q \n";
 	// PQ0=Q0
 	if (_reg_q & 0b0001)
 	{
@@ -1202,12 +1202,12 @@ void K1804BC2::__special__0010(bool c0, const Operands* ops, ALUReasult* res, IL
 	}
 }
 
-// Лог. F/2->Y, Лог. Q/2->Q; старшая МПС: Y3 = F3 xor OVR
+// Log. F/2->Y, Log. Q/2->Q; старшая МПС: Y3 = F3 xor OVR
 void K1804BC2::__special_load__0010(ALUReasult* res, ILogger* log)
 {
 	if (res == nullptr)
 		return;
-	std::string msg = "LOAD SP: Лог. F/2->Y \n";
+	std::string msg = "LOAD SP: Log. F/2->Y \n";
 	// PF0=F0
 	if ((res->F & 0b0001))
 	{
@@ -1359,7 +1359,7 @@ void K1804BC2::__special__0110(bool c0, const Operands* ops, ALUReasult* res, IL
 	if (ops == nullptr || res == nullptr)
 		return;
 
-	std::string msg = "Лог. Q/2->Q \n";
+	std::string msg = "Log. Q/2->Q \n";
 	// PQ0=Q0
 	if ((_reg_q & 0b0001))
 	{
@@ -1407,12 +1407,12 @@ void K1804BC2::__special__0110(bool c0, const Operands* ops, ALUReasult* res, IL
 	}
 }
 
-// Лог. F/2->Y, Лог. Q/2->Q
+// Log. F/2->Y, Log. Q/2->Q
 void K1804BC2::__special_load__0110(ALUReasult* res, ILogger* log)
 {
 	if (res == nullptr)
 		return;
-	std::string msg = "LOAD SP: Лог. F/2->Y \n";
+	std::string msg = "LOAD SP: Log. F/2->Y \n";
 	// PF0=F0
 	if ((res->Y & 0b0001))
 	{
@@ -1458,7 +1458,7 @@ void K1804BC2::__special__1000(bool c0, const Operands* ops, ALUReasult* res, IL
 	}
 }
 
-// F->Y, PF3=F3, Лог. 2Q->Q
+// F->Y, PF3=F3, Log. 2Q->Q
 void K1804BC2::__special_load__1000(ALUReasult* res, ILogger* log)
 {
 	if (res == nullptr)
@@ -1530,7 +1530,7 @@ void K1804BC2::__special__1010(bool c0, const Operands* ops, ALUReasult* res, IL
 		_reg_sign = !(static_cast<bool>(res->F & 0b1000) != static_cast<bool>(ops->R & 0b1000));
 }
 
-// Лог. 2F->Y, Лог. 2Q->Q
+// Log. 2F->Y, Log. 2Q->Q
 void K1804BC2::__special_load__1010(ALUReasult* res, ILogger* log)
 {
 	if (res == nullptr)
@@ -1615,7 +1615,7 @@ void K1804BC2::__special__1100(bool c0, const Operands* ops, ALUReasult* res, IL
 		_reg_sign = !(static_cast<bool>(res->F & 0b1000) != static_cast<bool>(ops->R & 0b1000));
 }
 
-// Лог. 2F->Y, Лог. 2Q->Q
+// Log. 2F->Y, Log. 2Q->Q
 void K1804BC2::__special_load__1100(ALUReasult* res, ILogger* log)
 {
 	if (res == nullptr)
@@ -1675,7 +1675,7 @@ void K1804BC2::__special__1110(bool c0, const Operands* ops, ALUReasult* res, IL
 	}
 }
 
-// F->Y, Лог. 2Q->Q
+// F->Y, Log. 2Q->Q
 void K1804BC2::__special_load__1110(ALUReasult* res, ILogger* log)
 {
 	if (res == nullptr)
