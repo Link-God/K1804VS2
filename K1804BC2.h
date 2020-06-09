@@ -20,6 +20,7 @@ class K1804BC2 : public IDSIMMODEL
 	IDSIMCKT* _ckt;
 	ABSTIME _time;
 	int _pos = OLD;
+	bool _Z_input = false;
 	uint32_t _dbg_counter = 0;
 	uint8_t _regs[NUM_OF_REGISTERS];
 	uint8_t _reg_q;
