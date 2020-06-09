@@ -505,7 +505,8 @@ K1804BC2::ALUReasult* K1804BC2::ALU(bool c0, uint8_t code, const Operands* ops, 
 		// I0 = 1 -> 1111
 	case 0:
 		__alu__0000(c0, I0, ops, special_code, res, log);
-		computeFlags(false, res, c0, ops, code);
+		if(!_special)
+			computeFlags(false, res, c0, ops, code);
 		break;
 		//S - R - 1 + C0
 	case 1:
@@ -614,7 +615,7 @@ void K1804BC2::__load__0000(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	res->Y = y & 0b1111;
 	if (log != nullptr)
 	{
-		log->log("Load: F/2->Y=" + std::to_string(res->Y & 0b1111) + " Q - hold");
+		log->log("Load: Arith. F/2->Y=" + std::to_string(res->Y & 0b1111) + " Q - hold");
 	}
 }
 
@@ -633,7 +634,7 @@ void K1804BC2::__load__0001(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	res->Y = (y) & 0b1111;
 	if (log != nullptr)
 	{
-		log->log("Load: F/2->Y=" + std::to_string(res->Y & 0b1111) + " Q - hold");
+		log->log("Load: Log. F/2->Y=" + std::to_string(res->Y & 0b1111) + " Q - hold");
 	}
 }
 
@@ -672,8 +673,8 @@ void K1804BC2::__load__0010(const CommandFields* cmd, ALUReasult* res, ILogger* 
 
 	if (log != nullptr)
 	{
-		log->log("Load: F/2->Y=" + std::to_string(res->Y & 0b1111) +
-			"Q/2->Q=" + std::to_string(_reg_q));
+		log->log("Load: Arith. F/2->Y=" + std::to_string(res->Y & 0b1111) +
+			"Arith. Q/2->Q=" + std::to_string(_reg_q));
 	}
 }
 
@@ -699,8 +700,8 @@ void K1804BC2::__load__0011(const CommandFields* cmd, ALUReasult* res, ILogger* 
 
 	if (log != nullptr)
 	{
-		log->log("Load: F/2->Y=" + std::to_string(res->Y & 0b1111) +
-			"Q/2->Q=" + std::to_string(_reg_q));
+		log->log("Load: Log. F/2->Y=" + std::to_string(res->Y & 0b1111) +
+			"Log. Q/2->Q=" + std::to_string(_reg_q));
 	}
 }
 
@@ -767,7 +768,7 @@ void K1804BC2::__load__0101(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	if (log != nullptr)
 	{
 		log->log("Load: Y=" + std::to_string(res->Y & 0b1111) +
-			" Q/2->Q=" + std::to_string(_reg_q));
+			"Log. Q/2->Q=" + std::to_string(_reg_q));
 	}
 }
 
@@ -869,7 +870,7 @@ void K1804BC2::__load__1000(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	res->Y = (y) & 0b1111;
 	if (log != nullptr)
 	{
-		log->log("Load: 2F->Y=" + std::to_string(res->Y & 0b1111) + " Q - hold");
+		log->log("Load:Arith. 2F->Y=" + std::to_string(res->Y & 0b1111) + " Q - hold");
 	}
 }
 
@@ -887,7 +888,7 @@ void K1804BC2::__load__1001(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	setState(_time, _pin_PQ3, 0);
 	if (log != nullptr)
 	{
-		log->log("Load: 2F->Y=" + std::to_string(res->Y & 0b1111) + " Q - hold");
+		log->log("Load:Log. 2F->Y=" + std::to_string(res->Y & 0b1111) + " Q - hold");
 	}
 }
 
@@ -926,8 +927,8 @@ void K1804BC2::__load__1010(const CommandFields* cmd, ALUReasult* res, ILogger* 
 
 	if (log != nullptr)
 	{
-		log->log("Load: 2F->Y=" + std::to_string(res->Y & 0b1111) +
-			" 2Q->Q=" + std::to_string(_reg_q));
+		log->log("Load:Arith. 2F->Y=" + std::to_string(res->Y & 0b1111) +
+			"Log. 2Q->Q=" + std::to_string(_reg_q));
 	}
 }
 
@@ -952,8 +953,8 @@ void K1804BC2::__load__1011(const CommandFields* cmd, ALUReasult* res, ILogger* 
 
 	if (log != nullptr)
 	{
-		log->log("Load: 2F->Y=" + std::to_string(res->Y & 0b1111) +
-			" 2Q->Q=" + std::to_string(_reg_q));
+		log->log("Load:Log. 2F->Y=" + std::to_string(res->Y & 0b1111) +
+			"Log. 2Q->Q=" + std::to_string(_reg_q));
 	}
 }
 
@@ -995,7 +996,7 @@ void K1804BC2::__load__1101(const CommandFields* cmd, ALUReasult* res, ILogger* 
 	if (log != nullptr)
 	{
 		log->log("Load: F->Y=" + std::to_string(res->Y & 0b1111) +
-			" 2Q->Q=" + std::to_string(_reg_q));
+			"Log. 2Q->Q=" + std::to_string(_reg_q));
 	}
 }
 
@@ -1042,7 +1043,7 @@ void K1804BC2::__special__0000(bool c0, const Operands* ops, ALUReasult* res, IL
 	if (ops == nullptr || res == nullptr)
 		return;
 
-	std::string msg = "Лог. Q/2->Q \n";
+	std::string msg = "Log. Q/2->Q \n";
 	// PQ0=Q0
 	if (_reg_q & 0b0001)
 	{
@@ -1090,12 +1091,12 @@ void K1804BC2::__special__0000(bool c0, const Operands* ops, ALUReasult* res, IL
 	}
 }
 
-// Лог. F/2->Y, Лог. Q/2->Q; старшая МПС: Y3 = C4
+// Log. F/2->Y, Log. Q/2->Q; старшая МПС: Y3 = C4
 void K1804BC2::__special_load__0000(ALUReasult* res, ILogger* log)
 {
 	if (res == nullptr)
 		return;
-	std::string msg = "LOAD SP: Лог. F/2->Y\n";
+	std::string msg = "LOAD SP: Log. F/2->Y\n";
 	// PF0=F0
 	if (res->F & 0b0001)
 	{
@@ -1121,29 +1122,6 @@ void K1804BC2::__special_load__0000(ALUReasult* res, ILogger* log)
 	else
 		setState(_time, _pin_PF3, 0);
 	msg += "Y=F/2=" + std::to_string(res->Y) + "\n";
-	// // PQ0=Q0
-	// if (_reg_q & 0b0001)
-	// {
-	// 	setState(_time, _pin_PQ0, 1); // PQ0 = 1
-	// 	msg += "PQ0=1,";
-	// }
-	// else
-	// {
-	// 	setState(_time, _pin_PQ0, -1); // PQ0 = 0
-	// 	msg += "PQ0=0,";
-	// }
-	// if (isLow(_pin_IEN))
-	// {
-	// 	// Q=Q/2
-	// 	_reg_q = _reg_q >> 1;
-	// 	// Q3 = PQ3
-	// 	if (isHigh(_pin_PQ3))
-	// 	{
-	// 		_reg_q |= 0b1000; // Q3 = 1
-	// 		msg += "Q3=PQ3=1,";
-	// 	}
-	// 	msg += "Q=Q/2=" + std::to_string(_reg_q) + "\n";
-	// }
 	if (log != nullptr)
 		log->log(msg);
 }
@@ -1154,7 +1132,7 @@ void K1804BC2::__special__0010(bool c0, const Operands* ops, ALUReasult* res, IL
 	if (ops == nullptr || res == nullptr)
 		return;
 
-	std::string msg = "Лог. Q/2->Q \n";
+	std::string msg = "Log. Q/2->Q \n";
 	// PQ0=Q0
 	if (_reg_q & 0b0001)
 	{
@@ -1202,12 +1180,12 @@ void K1804BC2::__special__0010(bool c0, const Operands* ops, ALUReasult* res, IL
 	}
 }
 
-// Лог. F/2->Y, Лог. Q/2->Q; старшая МПС: Y3 = F3 xor OVR
+// Log. F/2->Y, Log. Q/2->Q; старшая МПС: Y3 = F3 xor OVR
 void K1804BC2::__special_load__0010(ALUReasult* res, ILogger* log)
 {
 	if (res == nullptr)
 		return;
-	std::string msg = "LOAD SP: Лог. F/2->Y \n";
+	std::string msg = "LOAD SP: Log. F/2->Y \n";
 	// PF0=F0
 	if ((res->F & 0b0001))
 	{
@@ -1359,7 +1337,7 @@ void K1804BC2::__special__0110(bool c0, const Operands* ops, ALUReasult* res, IL
 	if (ops == nullptr || res == nullptr)
 		return;
 
-	std::string msg = "Лог. Q/2->Q \n";
+	std::string msg = "Log. Q/2->Q \n";
 	// PQ0=Q0
 	if ((_reg_q & 0b0001))
 	{
@@ -1407,12 +1385,12 @@ void K1804BC2::__special__0110(bool c0, const Operands* ops, ALUReasult* res, IL
 	}
 }
 
-// Лог. F/2->Y, Лог. Q/2->Q
+// Log. F/2->Y, Log. Q/2->Q
 void K1804BC2::__special_load__0110(ALUReasult* res, ILogger* log)
 {
 	if (res == nullptr)
 		return;
-	std::string msg = "LOAD SP: Лог. F/2->Y \n";
+	std::string msg = "LOAD SP: Log. F/2->Y \n";
 	// PF0=F0
 	if ((res->Y & 0b0001))
 	{
@@ -1458,7 +1436,7 @@ void K1804BC2::__special__1000(bool c0, const Operands* ops, ALUReasult* res, IL
 	}
 }
 
-// F->Y, PF3=F3, Лог. 2Q->Q
+// F->Y, PF3=F3, Log. 2Q->Q
 void K1804BC2::__special_load__1000(ALUReasult* res, ILogger* log)
 {
 	if (res == nullptr)
@@ -1530,7 +1508,7 @@ void K1804BC2::__special__1010(bool c0, const Operands* ops, ALUReasult* res, IL
 		_reg_sign = !(static_cast<bool>(res->F & 0b1000) != static_cast<bool>(ops->R & 0b1000));
 }
 
-// Лог. 2F->Y, Лог. 2Q->Q
+// Log. 2F->Y, Log. 2Q->Q
 void K1804BC2::__special_load__1010(ALUReasult* res, ILogger* log)
 {
 	if (res == nullptr)
@@ -1615,7 +1593,7 @@ void K1804BC2::__special__1100(bool c0, const Operands* ops, ALUReasult* res, IL
 		_reg_sign = !(static_cast<bool>(res->F & 0b1000) != static_cast<bool>(ops->R & 0b1000));
 }
 
-// Лог. 2F->Y, Лог. 2Q->Q
+// Log. 2F->Y, Log. 2Q->Q
 void K1804BC2::__special_load__1100(ALUReasult* res, ILogger* log)
 {
 	if (res == nullptr)
@@ -1675,7 +1653,7 @@ void K1804BC2::__special__1110(bool c0, const Operands* ops, ALUReasult* res, IL
 	}
 }
 
-// F->Y, Лог. 2Q->Q
+// F->Y, Log. 2Q->Q
 void K1804BC2::__special_load__1110(ALUReasult* res, ILogger* log)
 {
 	if (res == nullptr)
@@ -1788,10 +1766,11 @@ void K1804BC2::load(const CommandFields* cmd, ALUReasult* res, ILogger* log)
 
 void K1804BC2::special(bool c0, const Operands* ops, const uint8_t code, ALUReasult* res, ILogger* log)
 {
+	
 	_special = true;
 	// W = 0;
 	if (isLow(_pin_LSS))
-		setState(_time, _pin_W_MSS, -1);
+		setState(_time, _pin_W_MSS, 0);
 	switch (code)
 	{
 	case 0:
@@ -1850,7 +1829,11 @@ VOID K1804BC2::simulate(ABSTIME time, DSIMMODES mode)
 {
 	auto log = new Logger();
 	_time = time;
-
+	setState(time, _pin_Z, 0);
+	for (size_t i = 0; i < REGISTER_SIZE; ++i)
+		setState(time, _pin_DB[i], 0);
+	if (isHigh(_pin_LSS))
+		setState(time, _pin_W_MSS, 0);
 	if (isPosedge(_pin_T))
 	{
 		// получение микрокоманды
@@ -1876,11 +1859,13 @@ VOID K1804BC2::simulate(ABSTIME time, DSIMMODES mode)
 		_special = false;
 		// логирование
 		_inst->log(const_cast<CHAR*>(log->getLog().c_str()));
-
-		if (isHigh(_pin_IEN))
-			setState(time, _pin_W_MSS, 1);
-		else
-			setState(time, _pin_W_MSS, result->W ? 1 : -1);
+		if(isLow(_pin_LSS))
+		{
+			if (isHigh(_pin_IEN))
+				setState(time, _pin_W_MSS, 1);
+			else
+				setState(time, _pin_W_MSS, result->W ? 1 : -1);
+		}
 
 		delete result;
 		delete ops;
@@ -1891,17 +1876,18 @@ VOID K1804BC2::simulate(ABSTIME time, DSIMMODES mode)
 	{
 		for (size_t i = 0; i < REGISTER_SIZE; ++i)
 			setState(time, _pin_Y[i], _reg_y & (1 << i) ? 1 : -1);
-		setState(time, _pin_Z, _reg_z ? 1 : -1);
-		setState(time, _pin_C4, _reg_c4 ? 1 : -1);
-		setState(time, _pin_P_OVR, _reg_p_ovr ? 1 : -1);
-		setState(time, _pin_G_N, _reg_g_n ? 1 : -1);
 	}
 	else
 	{
 		for (size_t i = 0; i < REGISTER_SIZE; ++i)
 			setState(time, _pin_Y[i], 0);
 	}
-
+	if(!_Z_input)
+		setState(time, _pin_Z, _reg_z ? 1 : -1);
+	setState(time, _pin_C4, _reg_c4 ? 1 : -1);
+	setState(time, _pin_P_OVR, _reg_p_ovr ? 1 : -1);
+	setState(time, _pin_G_N, _reg_g_n ? 1 : -1);
+	
 	if (isLow(_pin_T) && isLow(_pin_WE))
 	{
 		auto pin_b = genValue(_pin_B, REGISTER_SIZE);
@@ -1988,6 +1974,7 @@ bool K1804BC2::compute_C3(bool c0, uint8_t G, uint8_t P)
 
 void K1804BC2::computeFlags(bool special, ALUReasult* res, bool c0, const Operands* ops, uint8_t code)
 {
+	_Z_input = false;
 	uint8_t G;
 	uint8_t P;
 	if (!special)
@@ -2215,7 +2202,10 @@ void K1804BC2::computeFlags(bool special, ALUReasult* res, bool c0, const Operan
 			if (_pos == YOUNG)
 				res->Z = _reg_q & 0b0001;
 			else
+			{
+				_Z_input = true;
 				res->Z = isHigh(_pin_Z);
+			}
 			if (!res->Z)
 			{
 				G = 0b0000;
@@ -2244,7 +2234,10 @@ void K1804BC2::computeFlags(bool special, ALUReasult* res, bool c0, const Operan
 			if (_pos == YOUNG)
 				res->Z = _reg_q & 0b0001;
 			else
+			{
+				_Z_input = true;
 				res->Z = isHigh(_pin_Z);
+			}
 			if (!res->Z)
 			{
 				G = 0b0000;
@@ -2297,7 +2290,10 @@ void K1804BC2::computeFlags(bool special, ALUReasult* res, bool c0, const Operan
 			if (_pos == OLD)
 				res->Z = ops->S & 0b1000;
 			else
+			{
+				_Z_input = true;
 				res->Z = isHigh(_pin_Z);
+			}
 			if (!res->Z)
 			{
 				P = ops->S;
@@ -2323,7 +2319,10 @@ void K1804BC2::computeFlags(bool special, ALUReasult* res, bool c0, const Operan
 			if (_pos == YOUNG)
 				res->Z = _reg_q & 0b0001;
 			else
+			{
+				_Z_input = true;
 				res->Z = isHigh(_pin_Z);
+			}
 			if (!res->Z)
 			{
 				G = 0b0000;
@@ -2386,7 +2385,10 @@ void K1804BC2::computeFlags(bool special, ALUReasult* res, bool c0, const Operan
 			if (_pos == OLD)
 				res->Z = _reg_sign;
 			else
+			{
+				_Z_input = true;
 				res->Z = isHigh(_pin_Z);
+			}
 			if (!res->Z)
 			{
 				G = ops->R & ops->S;
@@ -2413,7 +2415,10 @@ void K1804BC2::computeFlags(bool special, ALUReasult* res, bool c0, const Operan
 			if (_pos == OLD)
 				res->Z = _reg_sign;
 			else
+			{
+				_Z_input = true;
 				res->Z = isHigh(_pin_Z);
+			}
 			if (!res->Z)
 			{
 				G = ops->R & ops->S;
