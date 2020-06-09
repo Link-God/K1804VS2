@@ -1830,6 +1830,8 @@ VOID K1804BC2::simulate(ABSTIME time, DSIMMODES mode)
 	auto log = new Logger();
 	_time = time;
 	setState(time, _pin_Z, 0);
+	for (size_t i = 0; i < REGISTER_SIZE; ++i)
+		setState(time, _pin_DB[i], 0);
 	if (isHigh(_pin_LSS))
 		setState(time, _pin_W_MSS, 0);
 	if (isPosedge(_pin_T))
